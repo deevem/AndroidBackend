@@ -1,12 +1,12 @@
-package com.example.androidbackend.model;
+package com.thss.androidbackend.model.document;
 
-import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 import java.util.List;
 
+@Document
 public class Post {
-    @Id private String id;
     private User creator;
     private Date createTime;
     private Date lastUpdateTime;

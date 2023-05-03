@@ -1,4 +1,4 @@
-package com.example.androidbackend;
+package com.thss.androidbackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

@@ -1,5 +1,7 @@
 package com.thss.androidbackend.model.document;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.ManyToMany;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -17,6 +19,7 @@ public class User {
     @Id private String id;
     @Indexed(unique = true)
     private String username;
+    @JsonIgnore
     private String password;
     @Indexed(unique = true)
     private String email;

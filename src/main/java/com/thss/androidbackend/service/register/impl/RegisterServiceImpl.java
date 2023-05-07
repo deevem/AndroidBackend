@@ -30,9 +30,9 @@ public class RegisterServiceImpl implements RegisterService {
             result.setUsername(user.getUsername());
             return result;
         } catch (Exception e) {
-
+            e.printStackTrace();
+            return null;
         }
-        return null;
     }
     @Override
     public RegisterResultVo register(@NotNull EmailRegisterDto dto) {

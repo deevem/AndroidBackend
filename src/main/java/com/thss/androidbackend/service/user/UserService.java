@@ -10,4 +10,6 @@ public interface UserService {
     public User create(@NotNull UsernameRegisterDto dto);
     public User create(@NotNull EmailRegisterDto dto);
     public User create(@NotNull PhoneRegisterDto dto);
+
+    public String generateToken(@NotNull User user);
 }

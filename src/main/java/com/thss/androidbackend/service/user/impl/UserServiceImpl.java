@@ -7,18 +7,21 @@ import com.thss.androidbackend.model.dto.register.UsernameRegisterDto;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.user.UserService;
 import jakarta.validation.constraints.NotNull;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    private UserRepository userRepo;
+    private final UserRepository userRepo;
+
+    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public User create(@NotNull UsernameRegisterDto dto){
-        if (userRepo.findByUserName(dto.username()) != null) {
+        if (userRepo.findByUsername(dto.username()) != null) {
             throw new RuntimeException("Username already exists");
         }
         User user = new User();
@@ -48,5 +51,11 @@ public class UserServiceImpl implements UserService {
 //        user.setNickname("thss" + user.getId().toString());
 //        return userRepo.insert(user);
         return null;
+    }
+
+    @Override
+    public String generateToken(User user) {
+        return "";
+
     }
 }

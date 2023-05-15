@@ -9,3 +9,4 @@ public interface Usermeta {
     String getUserIconUrl();
     String getNickname();
 }
+

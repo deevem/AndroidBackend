@@ -1,20 +1,33 @@
 package com.thss.androidbackend.model.document;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.Date;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 
-@Document
+@Document("posts")
+@Getter
+@Setter
 public class Post {
+    @Id private String id;
+    @DBRef(lazy = true)
     private User creator;
-    private Date createTime;
-    private Date lastUpdateTime;
+    private LocalDateTime createTime = LocalDateTime.now();
+    private LocalDateTime lastUpdateTime = LocalDateTime.now();
     private String title;
     private String content;
-    private List<Reply> comments;
-    private List<String> images;
-    private List<User> favorites;
-    private List<User> likes;
-    private String tag;
+    @DBRef(lazy = true)
+    private List<Reply> comments = new ArrayList<>();
+    private List<String> images = new ArrayList<>();
+    @DBRef(lazy = true)
+    private Set<User> favorites = new HashSet<>();
+    @DBRef(lazy = true)
+    private Set<User> likes = new HashSet<>();
+    private Set<String> tag = new HashSet<>();
+
+
 }

@@ -8,7 +8,7 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 @RepositoryRestResource(exported = true)
 public interface UserRepository extends MongoRepository<User, String> {
     @Query(value = "{ 'name' : :#{#username} }")
-    User findByUserName(String username);
+    User findByUsername(String username);
 
     @Query(value = "{ 'email' : :#{#email} }")
     User findByEmail(String email);
@@ -16,6 +16,4 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query(value = "{ 'phone' : :#{#phone} }")
     User findByPhone(String phone);
 
-    @Query(value = "{ 'phone' : :#{#phone} }")
-    User findByssse(String phone);
 }

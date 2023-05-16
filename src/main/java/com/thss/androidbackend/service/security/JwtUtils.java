@@ -30,7 +30,7 @@ public class JwtUtils {
     public static boolean verify(String token){
         try {
             Claims claims = Jwts.parserBuilder().setSigningKey(key.getBytes()).build().parseClaimsJws(token).getBody();
-            return (claims.getExpiration().before(new Date()) && claims.);
+            return true;
         }
         catch (Exception e){
             e.printStackTrace();

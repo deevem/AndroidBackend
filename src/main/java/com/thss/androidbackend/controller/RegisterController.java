@@ -23,11 +23,11 @@ public class RegisterController {
     private final RegisterService registerService;
 
     @PostMapping("/username")
-    public ResponseEntity<RegisterResultVo> register(@Valid @RequestBody UsernameRegisterDto dto){
+    public ResponseEntity<String> register(@Valid @RequestBody UsernameRegisterDto dto){
         RegisterResultVo result = registerService.register(dto);
         if (Objects.isNull(result))
             return ResponseEntity.badRequest().body(null);
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok("Registered");
 
     }
     @PostMapping("/email")

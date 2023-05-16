@@ -4,6 +4,7 @@ import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.login.EmailLoginDto;
 import com.thss.androidbackend.model.dto.login.PhoneLoginDto;
 import com.thss.androidbackend.model.dto.login.UsernameLoginDto;
+import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.service.login.LoginService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +25,7 @@ public class LoginController {
         String token = loginService.login(dto);
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + token);
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(new TokenVo("Bearer " + token), headers, HttpStatus.OK);
     }
     @PostMapping("/email")
     public ResponseEntity login(@RequestBody @NotNull EmailLoginDto dto){
@@ -42,15 +43,12 @@ public class LoginController {
     }
     @GetMapping("/isLogin")
     public String isLogin(){
-        System.out.println("isLogin");
-        return "success";
+        return "";
     }
 
     @GetMapping("/logout")
     public ResponseEntity logout(){
         loginService.logout();
-
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getName());
         return ResponseEntity.ok().body("logout success");
     }
 }

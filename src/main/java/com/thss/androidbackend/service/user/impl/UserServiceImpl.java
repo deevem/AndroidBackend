@@ -5,19 +5,22 @@ import com.thss.androidbackend.model.dto.register.EmailRegisterDto;
 import com.thss.androidbackend.model.dto.register.PhoneRegisterDto;
 import com.thss.androidbackend.model.dto.register.UsernameRegisterDto;
 import com.thss.androidbackend.repository.UserRepository;
+import com.thss.androidbackend.service.user.CounterService;
 import com.thss.androidbackend.service.user.UserService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
-
-    private final RedisTemplate<String, String> redisTemplate;
+    private final BCryptPasswordEncoder passwordEncoder;
+    private final CounterService counterService;
 
     @Override
     public User create(@NotNull UsernameRegisterDto dto){
@@ -26,7 +29,9 @@ public class UserServiceImpl implements UserService {
         }
         User user = new User();
         user.setUsername(dto.username());
-        user.setPassword(dto.password());
+        user.setPassword(passwordEncoder.encode(dto.password()));
+        System.out.println(passwordEncoder.encode(dto.password()));
+        user.setId(counterService.getNextSequence("customSequences"));
         user.setNickname("thss" + user.getId().toString());
         return userRepo.insert(user);
     }
@@ -51,11 +56,5 @@ public class UserServiceImpl implements UserService {
 //        user.setNickname("thss" + user.getId().toString());
 //        return userRepo.insert(user);
         return null;
-    }
-
-    @Override
-    public String generateToken(User user) {
-        return "";
-
     }
 }

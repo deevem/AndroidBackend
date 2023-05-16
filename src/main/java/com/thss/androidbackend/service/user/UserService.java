@@ -6,10 +6,11 @@ import com.thss.androidbackend.model.dto.register.PhoneRegisterDto;
 import com.thss.androidbackend.model.dto.register.UsernameRegisterDto;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
+
 public interface UserService {
     public User create(@NotNull UsernameRegisterDto dto);
     public User create(@NotNull EmailRegisterDto dto);
     public User create(@NotNull PhoneRegisterDto dto);
 
-    public String generateToken(@NotNull User user);
 }

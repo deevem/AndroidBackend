@@ -1,6 +1,8 @@
 package com.thss.androidbackend.model.document;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -9,14 +11,18 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Document("users")
 @Getter
 @Setter
 public class User {
-    @Id private String id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private String id;
     @Indexed(unique = true)
     private String username;
     @JsonIgnore
@@ -38,5 +44,6 @@ public class User {
     @DBRef(lazy  = true)
     private Set<Post> postList = new HashSet<>();
     private Set<String> interestedTags = new HashSet<>();
+    private List<String> roles = new ArrayList<>();
 
 }

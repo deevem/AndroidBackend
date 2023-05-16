@@ -12,6 +12,8 @@ import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
+
 
 @RestController
 @RequiredArgsConstructor
@@ -22,7 +24,11 @@ public class RegisterController {
 
     @PostMapping("/username")
     public ResponseEntity<RegisterResultVo> register(@Valid @RequestBody UsernameRegisterDto dto){
-        return ResponseEntity.ok(registerService.register(dto));
+        RegisterResultVo result = registerService.register(dto);
+        if (Objects.isNull(result))
+            return ResponseEntity.badRequest().body(null);
+        return ResponseEntity.ok(result);
+
     }
     @PostMapping("/email")
     public ResponseEntity<RegisterResultVo> register(@Valid @RequestBody EmailRegisterDto dto){

@@ -5,9 +5,9 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
-@RepositoryRestResource(exported = true)
+@RepositoryRestResource
 public interface UserRepository extends MongoRepository<User, String> {
-    @Query(value = "{ 'name' : :#{#username} }")
+    @Query
     User findByUsername(String username);
 
     @Query(value = "{ 'email' : :#{#email} }")

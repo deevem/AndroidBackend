@@ -1,25 +1,29 @@
 package com.thss.androidbackend.config;
 
-import com.thss.androidbackend.service.security.UnauthorizedEntryPoint;
+import com.thss.androidbackend.service.security.JwtAuthorizationFilter;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig{
-    private final UserDetailsService userDetailsService;
-
 
     @Bean
     public PasswordEncoder passwordEncoder(){
@@ -27,22 +31,32 @@ public class SecurityConfig{
     }
 
     @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(@NotNull HttpSecurity http) throws Exception {
         http
                 .csrf().disable()
-                .exceptionHandling().authenticationEntryPoint(new UnauthorizedEntryPoint()).and()
+                .exceptionHandling()
+                .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                .accessDeniedHandler((request, response, accessDeniedException) -> response.setStatus(HttpStatus.FORBIDDEN.value())).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .logout().logoutUrl("/login/logout").and()
                 .authorizeHttpRequests()
-                .requestMatchers("/login").permitAll()
-                .requestMatchers("/register").permitAll()
-                .requestMatchers("/logout").authenticated()
+                .requestMatchers(HttpMethod.POST,"/login/**").permitAll()
+                .requestMatchers(HttpMethod.POST,"/register/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/users/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()
-                .requestMatchers("/images/**").permitAll();
-        http
-                .addFilterBefore(authenticationTo)
+                .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
+                .anyRequest().authenticated().and()
+                .apply(securityConfigurationAdapter());
         return http.build();
 
     }
 
+    private JwtConfig securityConfigurationAdapter() throws Exception{
+        return new JwtConfig (new JwtAuthorizationFilter(authenticationManager(null)));
+    }
 }

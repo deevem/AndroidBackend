@@ -1,10 +1,14 @@
 package com.thss.androidbackend.controller;
 
+import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
+import com.thss.androidbackend.model.vo.post.PostCover;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
+import com.thss.androidbackend.service.post.PostService;
+import com.thss.androidbackend.service.security.SecurityService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
@@ -17,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -30,24 +35,28 @@ public class PostController {
     private static String UPLOAD_PATH = "File/image";
     @Resource
     private final PostRepository postRepository;
-
+    private final PostService postService;
     private final UserRepository userRepository;
+    private final SecurityService securityService;
 
-    @RequestMapping(method = RequestMethod.POST, value = "/posts")
+    @PostMapping(value = "/posts")
     public @ResponseBody ResponseEntity<?> post(@NotNull @RequestBody PostCreateDto dto) {
-        Post newPost = new Post();
-        if(dto.authorId() == null) {
-            return new ResponseEntity<String>("Author ID cannot be null", HttpStatus.BAD_REQUEST);
+        try {
+            postService.create(dto);
+            return ResponseEntity.created(URI.create("/posts")).body("Post created");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
         }
-        Optional<User> creator = userRepository.findById(dto.authorId());
-        if(creator.isEmpty()) {
-            return new ResponseEntity<String>("User not found", HttpStatus.NOT_FOUND);
+    }
+
+    @GetMapping(value = "/posts/{id}")
+    public @ResponseBody ResponseEntity<?> getPost(@PathVariable String id) {
+        Optional<Post> post = postRepository.findById(id);
+        if(post.isEmpty()) {
+            return new ResponseEntity("Post not found", HttpStatus.NOT_FOUND);
         }
-        newPost.setCreator(creator.get());
-        newPost.setContent(dto.content());
-        newPost.setTitle(dto.title());
-        postRepository.save(newPost);
-        return new ResponseEntity<String>(HttpStatus.CREATED);
+        PostCover cover = postService.getPostCover(id);
+        return ResponseEntity.ok().body(cover);
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/posts/{id}/uploadImage")
@@ -83,5 +92,14 @@ public class PostController {
             }
         }
         return ResponseEntity.badRequest().body("upload failed");
+    }
+    @PostMapping(value = "/posts/{id}/like")
+    public @ResponseBody ResponseEntity like(@NotNull @PathVariable String id) {
+        try {
+            postService.like(id);
+            return ResponseEntity.ok("like success");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
     }
 }

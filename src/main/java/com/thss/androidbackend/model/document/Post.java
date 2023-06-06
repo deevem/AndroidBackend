@@ -28,6 +28,7 @@ public class Post {
     @DBRef(lazy = true)
     private Set<User> likes = new HashSet<>();
     private Set<String> tag = new HashSet<>();
+    private int shares = 0;
 
 
 }

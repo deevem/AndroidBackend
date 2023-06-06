@@ -39,7 +39,6 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(dto.username());
         user.setPassword(passwordEncoder.encode(dto.password()));
-        System.out.println(passwordEncoder.encode(dto.password()));
         user.setId(counterService.getNextSequence("customSequences"));
         user.setNickname("thss" + user.getId().toString());
         return userRepo.insert(user);

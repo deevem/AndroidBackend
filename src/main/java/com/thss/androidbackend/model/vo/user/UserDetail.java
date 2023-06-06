@@ -13,8 +13,6 @@ public record UserDetail (
         String description,
         int followNum,
         int subscriberNum,
-        Page<Post> postListPage,
-        List<String> interestedTags,
         boolean isFollowed
 
 

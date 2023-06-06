@@ -2,9 +2,8 @@ package com.thss.androidbackend.controller;
 
 import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
-import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
-import com.thss.androidbackend.model.vo.post.PostCover;
+import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.post.PostService;

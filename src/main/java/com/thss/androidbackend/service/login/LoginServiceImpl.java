@@ -1,4 +1,4 @@
-package com.thss.androidbackend.service.login.Impl;
+package com.thss.androidbackend.service.login;
 
 import com.thss.androidbackend.config.SecurityConfig;
 import com.thss.androidbackend.model.document.User;

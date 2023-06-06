@@ -42,7 +42,7 @@ public class User {
     @DBRef(lazy = true)
     private Set<User> subscriberList = new HashSet<>();
     @DBRef(lazy  = true)
-    private Set<Post> postList = new HashSet<>();
+    private List<Post> postList = new ArrayList<>();
     private Set<String> interestedTags = new HashSet<>();
     private List<String> roles = new ArrayList<>();
 

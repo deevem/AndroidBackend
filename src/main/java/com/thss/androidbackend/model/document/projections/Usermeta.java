@@ -6,7 +6,7 @@ import org.springframework.data.rest.core.config.Projection;
 @Projection(name = "usermeta", types = {User.class} )
 public interface Usermeta {
     String getUsername();
-    String getUserIconUrl();
+    String getAvatarUrl();
     String getNickname();
 }
 

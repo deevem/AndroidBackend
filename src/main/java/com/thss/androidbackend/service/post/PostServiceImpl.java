@@ -34,6 +34,8 @@ public class PostServiceImpl implements PostService {
         newPost.setContent(dto.content());
         newPost.setTitle(dto.title());
         postRepository.save(newPost);
+        user.getPostList().add(newPost);
+        userRepository.save(user);
     }
 
     @Override

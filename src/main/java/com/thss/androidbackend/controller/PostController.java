@@ -49,8 +49,8 @@ public class PostController {
         }
     }
 
-    @GetMapping(value = "/posts/{id}")
-    public @ResponseBody ResponseEntity<?> getPost(@PathVariable String id) {
+    @GetMapping(value = "/posts/{id}/cover")
+    public @ResponseBody ResponseEntity postCover(@PathVariable String id) {
         Optional<Post> post = postRepository.findById(id);
         if(post.isEmpty()) {
             return new ResponseEntity("Post not found", HttpStatus.NOT_FOUND);

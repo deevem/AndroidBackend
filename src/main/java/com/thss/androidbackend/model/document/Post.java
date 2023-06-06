@@ -29,6 +29,4 @@ public class Post {
     private Set<User> likes = new HashSet<>();
     private Set<String> tag = new HashSet<>();
     private int shares = 0;
-
-
 }

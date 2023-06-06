@@ -1,6 +1,5 @@
-package com.thss.androidbackend.model.vo.post;
+package com.thss.androidbackend.model.vo.forum;
 
-import com.thss.androidbackend.model.document.projections.Usermeta;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 
 import java.io.Serializable;

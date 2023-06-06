@@ -35,7 +35,7 @@ public class SecurityConfig{
     private final FilterChainExceptionHandler filterChainExceptionHandler;
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public BCryptPasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
 

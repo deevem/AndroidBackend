@@ -1,16 +1,19 @@
-package com.thss.androidbackend.service.user.impl;
+package com.thss.androidbackend.service.user;
 
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.register.EmailRegisterDto;
 import com.thss.androidbackend.model.dto.register.PhoneRegisterDto;
 import com.thss.androidbackend.model.dto.register.UsernameRegisterDto;
 import com.thss.androidbackend.model.dto.user.UpdatePasswordDto;
+import com.thss.androidbackend.model.vo.user.UserDetail;
+import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.security.SecurityService;
 import com.thss.androidbackend.service.user.CounterService;
 import com.thss.androidbackend.service.user.UserService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -110,5 +113,49 @@ public class UserServiceImpl implements UserService {
         }
         user.setPassword(passwordEncoder.encode(dto.oldPassword()));
         userRepo.save(user);
+    }
+    public UserMeta getUserMeta(String userId){
+        User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return getUserMeta(user);
+    }
+    public UserMeta getUserMeta(User user){
+        UserMeta meta = new UserMeta(
+                user.getId(),
+                user.getAvatarUrl(),
+                user.getNickname()
+        );
+        return meta;
+    }
+    public UserDetail getUserDetail(String userId){
+        User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        return getUserDetail(user);
+    }
+    public UserDetail getUserDetail(User user){
+        UserDetail detail;
+        if(securityService.isAnonymous()){
+            detail = new UserDetail(
+                    user.getId(),
+                    user.getAvatarUrl(),
+                    user.getNickname(),
+                    user.getDescription(),
+                    user.getFollowList().size(),
+                    user.getSubscriberList().size(),
+                    false
+                    );
+        } else {
+            boolean liked = user.getSubscriberList().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            detail = new UserDetail(
+                    user.getId(),
+                    user.getNickname(),
+                    user.getAvatarUrl(),
+                    user.getDescription(),
+                    user.getFollowList().size(),
+                    user.getSubscriberList().size(),
+                    liked
+            );
+        }
+
+        return detail;
     }
 }

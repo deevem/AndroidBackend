@@ -1,5 +1,7 @@
 package com.thss.androidbackend.service.security;
 
+import com.thss.androidbackend.model.document.User;
+import com.thss.androidbackend.repository.UserRepository;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -21,6 +23,7 @@ import java.util.Objects;
 @Component
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
     private final RedisTemplate<String, String> redisTemplate;
+    private final UserRepository userRepository;
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         setAuthorization(request);
@@ -43,7 +46,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                 System.out.println("token:      " + token);
                 return ;
             }
-            Authentication auth = JwtUtils.getAuthentication(token);
+            User user = userRepository.findByUsername(username);
+            Authentication auth = JwtUtils.getAuthentication(user, token);
+            System.out.println(user.getId());
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

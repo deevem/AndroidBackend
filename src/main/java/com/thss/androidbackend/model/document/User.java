@@ -33,7 +33,7 @@ public class User {
     private String phoneNumber;
     private String Nickname;
     private String description = "There is no description yet.";
-    private String userIconUrl = "";
+    private String avatarUrl = "";
     private LocalDateTime createTime = LocalDateTime.now();
     private LocalDateTime lastLoginTime = LocalDateTime.now();
     private Boolean banned = false;

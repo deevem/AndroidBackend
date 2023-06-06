@@ -1,8 +1,11 @@
 package com.thss.androidbackend.service.security;
 
 import com.thss.androidbackend.exception.CustomException;
+import com.thss.androidbackend.model.document.User;
+import com.thss.androidbackend.repository.UserRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import net.minidev.json.JSONObject;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,11 +54,10 @@ public class JwtUtils {
 
     }
 
-    public static Authentication getAuthentication(String token) {
+    public static Authentication getAuthentication(User user, String token) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key.getBytes()).build().parseClaimsJws(token).getBody();
         List<String> roles = claims.get("role", List.class);
         List<SimpleGrantedAuthority> authorities = Objects.isNull(roles) ? Collections.singletonList(new SimpleGrantedAuthority("user")) : roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        String username = claims.getSubject();
-        return new UsernamePasswordAuthenticationToken(username, token, authorities);
+        return new UsernamePasswordAuthenticationToken(user, token, authorities);
     }
 }

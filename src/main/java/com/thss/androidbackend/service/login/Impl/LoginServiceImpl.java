@@ -22,6 +22,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -31,6 +32,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final AuthenticationManager authenticationManager;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
     private final SecurityService securityService;
@@ -39,17 +41,20 @@ public class LoginServiceImpl implements LoginService {
 
         if (Objects.isNull(user)) throw new UsernameNotFoundException("User not found");
 
-        if (new BCryptPasswordEncoder().matches(dto.password(),user.getPassword())) {
+        if (passwordEncoder.matches(dto.password(),user.getPassword())) {
             List<String> roles = user.getRoles();
             if (roles.isEmpty()) roles = Collections.singletonList("ROLE_USER");
             String token = JwtUtils.generateJwtToken(user.getUsername(), roles);
+
+            user.setLastLoginTime(LocalDateTime.now());
+            userRepository.save(user);
 
             if(redisTemplate.hasKey(user.getUsername())) {
                 redisTemplate.delete(user.getUsername());
             }
             redisTemplate.opsForValue().set(user.getUsername(), token, SecurityConfig.EXPIRATION_TIME);
 
-            Authentication authentication = JwtUtils.getAuthentication(token);
+            Authentication authentication = JwtUtils.getAuthentication(user, token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return token;

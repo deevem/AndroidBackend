@@ -1,8 +1,10 @@
 package com.thss.androidbackend.service.security;
 
+import com.thss.androidbackend.exception.CustomException;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import net.minidev.json.JSONObject;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,6 +27,16 @@ public class JwtUtils {
                         .signWith(Keys.hmacShaKeyFor(key.getBytes()), SignatureAlgorithm.HS256)
                         .compact();
         return token;
+    }
+
+    public static Claims parse(String token){
+        try {
+            Claims claims = Jwts.parserBuilder().setSigningKey(key.getBytes()).build().parseClaimsJws(token).getBody();
+            return claims;
+        } catch (ExpiredJwtException e) {
+            e.printStackTrace();
+            throw new CustomException(HttpStatus.UNAUTHORIZED, e.getClass().toString().substring(6));
+        }
     }
 
     public static boolean verify(String token){

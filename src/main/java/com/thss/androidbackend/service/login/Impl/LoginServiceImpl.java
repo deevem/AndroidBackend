@@ -8,9 +8,11 @@ import com.thss.androidbackend.model.dto.login.UsernameLoginDto;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.login.LoginService;
 import com.thss.androidbackend.service.security.JwtUtils;
+import com.thss.androidbackend.service.security.SecurityService;
 import com.thss.androidbackend.service.user.UserService;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -29,7 +31,9 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LoginServiceImpl implements LoginService {
     private final AuthenticationManager authenticationManager;
+    private final RedisTemplate<String, String> redisTemplate;
     private final UserRepository userRepository;
+    private final SecurityService securityService;
     public String login(@NotNull UsernameLoginDto dto){
         User user = userRepository.findByUsername(dto.username());
 
@@ -39,6 +43,11 @@ public class LoginServiceImpl implements LoginService {
             List<String> roles = user.getRoles();
             if (roles.isEmpty()) roles = Collections.singletonList("ROLE_USER");
             String token = JwtUtils.generateJwtToken(user.getUsername(), roles);
+
+            if(redisTemplate.hasKey(user.getUsername())) {
+                redisTemplate.delete(user.getUsername());
+            }
+            redisTemplate.opsForValue().set(user.getUsername(), token, SecurityConfig.EXPIRATION_TIME);
 
             Authentication authentication = JwtUtils.getAuthentication(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -56,6 +65,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     public void logout(){
+        redisTemplate.delete(securityService.getCurrentUsername());
         SecurityContextHolder.clearContext();
     }
 }

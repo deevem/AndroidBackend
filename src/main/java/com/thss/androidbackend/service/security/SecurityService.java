@@ -1,5 +1,8 @@
 package com.thss.androidbackend.service.security;
 
-public interface SecurityService {
+import com.thss.androidbackend.model.document.User;
 
+public interface SecurityService {
+    User getCurrentUser();
+    String getCurrentUsername();
 }

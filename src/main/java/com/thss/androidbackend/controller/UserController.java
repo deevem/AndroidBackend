@@ -79,8 +79,9 @@ public class UserController {
     ResponseEntity<?> updateAvatar(@NotNull HttpServletRequest httpServletRequest){
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
         MultipartFile avatar = multipartHttpServletRequest.getFile("avatar");
-        imageService.uploadImage(avatar);
-        userService.updateAvatar(avatar.getOriginalFilename());
+        String name = imageService.uploadImage(avatar);
+        if(name == null) return ResponseEntity.badRequest().body("upload avatar failed");
+        userService.updateAvatar(name);
         return ResponseEntity.ok().body("update avatar success");
     }
     @PostMapping("/users/update/password")

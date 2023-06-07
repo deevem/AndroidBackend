@@ -106,7 +106,7 @@ public class UserController {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
         List<UserMeta> subscribeList = user.get().getFollowList().stream()
                 .map(uu -> userService.getUserMeta(uu)).toList()
-                .subList(page * size, Math.min((page + 1) * size, user.get().getSubscriberList().size()));
+                .subList(page * size, Math.min((page + 1) * size, user.get().getFollowList().size()));
         Page<UserMeta> subscribeListPage = new PageImpl<>(subscribeList, pageable, subscribeList.size());
         return ResponseEntity.ok().body(subscribeListPage);
     }

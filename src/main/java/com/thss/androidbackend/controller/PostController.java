@@ -2,16 +2,20 @@ package com.thss.androidbackend.controller;
 
 import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
+import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
+import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
-import com.thss.androidbackend.service.post.PostService;
+import com.thss.androidbackend.service.forum.PostService;
+import com.thss.androidbackend.service.forum.ReplyService;
 import com.thss.androidbackend.service.security.SecurityService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,6 +39,7 @@ public class PostController {
     @Resource
     private final PostRepository postRepository;
     private final PostService postService;
+    private final ReplyService replyService;
     private final UserRepository userRepository;
     private final SecurityService securityService;
 
@@ -97,6 +102,38 @@ public class PostController {
         try {
             postService.like(id);
             return ResponseEntity.ok("like success");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @PostMapping(value = "/posts/{id}/reply")
+    public @ResponseBody ResponseEntity reply(@NotNull @PathVariable String id, @NotNull @RequestBody ReplyCreateDto dto) {
+        try {
+            Reply reply = replyService.create(dto);
+            postService.addReply(id, reply);
+            return ResponseEntity.created(URI.create("/posts/" + id + "/reply/" + reply.getId())).body("Reply created");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @DeleteMapping(value = "/posts/{id}/reply/{replyId}")
+    public @ResponseBody ResponseEntity deleteReply(@NotNull @PathVariable String id, @NotNull @PathVariable String replyId) {
+        try {
+            replyService.delete(replyId);
+            postService.deleteReply(id, replyId);
+            return ResponseEntity.ok("Reply deleted");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @GetMapping(value = "/posts/{id}/reply")
+    public @ResponseBody ResponseEntity getReply(@NotNull @PathVariable String id,
+                                                 @RequestParam(value = "page", defaultValue = "0") int page,
+                                                 @RequestParam(value = "size", defaultValue = "10") int size) {
+        try {
+            List<Reply> replies = postService.getPostDetail(id).replies();
+            Pageable pageable = Pageable.ofSize(size).withPage(page);
+            return ResponseEntity.ok(replies);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

@@ -1,7 +1,6 @@
 package com.thss.androidbackend.controller;
 
 
-import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.user.UpdateDescriptionDto;
 import com.thss.androidbackend.model.dto.user.UpdateNicknameDto;
@@ -11,7 +10,7 @@ import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.image.ImageService;
-import com.thss.androidbackend.service.post.PostService;
+import com.thss.androidbackend.service.forum.PostService;
 import com.thss.androidbackend.service.security.SecurityService;
 import com.thss.androidbackend.service.user.UserService;
 import jakarta.annotation.Resource;
@@ -30,7 +29,6 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @Controller
 @RepositoryRestController

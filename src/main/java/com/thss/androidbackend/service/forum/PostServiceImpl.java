@@ -1,13 +1,15 @@
-package com.thss.androidbackend.service.post;
+package com.thss.androidbackend.service.forum;
 
 import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
+import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostDetail;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.PostRepository;
+import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.security.SecurityService;
 import lombok.RequiredArgsConstructor;
@@ -153,5 +155,25 @@ public class PostServiceImpl implements PostService {
             }
 
             return detail;
+    }
+    public void addReply(String postId, Reply reply){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        Post realPost = post.get();
+        realPost.getComments().add(reply);
+        postRepository.save(realPost);
+    }
+
+    @Override
+    public void deleteReply(String postId, String replyId) {
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        Post realPost = post.get();
+        realPost.getComments().removeIf(reply -> reply.getId().equals(replyId));
+        postRepository.save(realPost);
     }
 }

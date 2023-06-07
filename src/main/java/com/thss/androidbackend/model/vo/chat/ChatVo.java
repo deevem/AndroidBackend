@@ -5,4 +5,10 @@ import com.thss.androidbackend.model.vo.user.UserMeta;
 import java.io.Serializable;
 import java.util.List;
 
-public record UserChatVo(List<ChatVo> userChat) implements Serializable { }
+public record ChatVo(
+        UserMeta selfUserMeta,
+        UserMeta targetUserMeta,
+        List<ChatMessage> messages
+) implements Serializable {
+
+}

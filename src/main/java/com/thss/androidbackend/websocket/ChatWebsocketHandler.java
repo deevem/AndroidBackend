@@ -3,8 +3,11 @@ package com.thss.androidbackend.websocket;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.thss.androidbackend.model.document.ChatMessage;
+import com.thss.androidbackend.repository.ChatMessageRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 import org.springframework.web.socket.*;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
@@ -13,8 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+@Service
 @RequiredArgsConstructor
 public class ChatWebsocketHandler extends TextWebSocketHandler {
+
+    private final ChatMessageRepository chatMessageRepository;
 
     class MessageToClient {
         private String senderId;
@@ -76,6 +82,7 @@ public class ChatWebsocketHandler extends TextWebSocketHandler {
                 }
 
                 // save message to database
+                chatMessageRepository.insert(new ChatMessage(senderId, receiverId, messageContent));
 
                 if (Boolean.TRUE.equals(websocketSessionMapping.containsKey(receiverId))) {
                     // send message to receiver if websocket connect on

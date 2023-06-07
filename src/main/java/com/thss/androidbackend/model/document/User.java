@@ -21,9 +21,9 @@ import java.util.Set;
 @Setter
 public class User {
     @Id
+    @Indexed(unique = true)
     @GeneratedValue(strategy = GenerationType.AUTO)
     private String id;
-    @Indexed(unique = true)
     private String username;
     @JsonIgnore
     private String password;

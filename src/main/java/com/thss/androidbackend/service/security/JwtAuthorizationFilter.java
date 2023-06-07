@@ -18,6 +18,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
@@ -38,16 +39,16 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         String token = authorization.substring(7);
         Claims claims = JwtUtils.parse(token);
         if (!Objects.isNull(claims)){
-            String username = claims.getSubject();
-            String redisToken = redisTemplate.opsForValue().get(username);
+            String userid = claims.getSubject();
+            String redisToken = redisTemplate.opsForValue().get(userid);
             if (redisToken == null || !redisToken.equals(token)){
-                System.out.println("username:" + username);
+                System.out.println("userid:" + userid);
                 System.out.println("redisToken: " + redisToken);
                 System.out.println("token:      " + token);
                 return ;
             }
-            User user = userRepository.findByUsername(username);
-            Authentication auth = JwtUtils.getAuthentication(user, token);
+            Optional<User> user = userRepository.findById(userid);
+            Authentication auth = JwtUtils.getAuthentication(user.get(), token);
             SecurityContextHolder.getContext().setAuthentication(auth);
         }
 

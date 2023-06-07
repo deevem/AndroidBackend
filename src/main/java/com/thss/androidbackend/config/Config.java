@@ -17,8 +17,16 @@ class Config{
     public LettuceConnectionFactory redisConnectionFactory() {
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
     }
+
     @Bean
     public RedisTemplate<String, String> redisTemplate() {
+        RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        return redisTemplate;
+    }
+
+    @Bean(name = "websocketSessionMapping")
+    public RedisTemplate<String, String> websocketSessionMapping() {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
         redisTemplate.setConnectionFactory(redisConnectionFactory());
         return redisTemplate;

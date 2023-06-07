@@ -21,6 +21,7 @@ public interface UserService {
     void updateAvatar(@NotNull String avatar);
     void ban(@NotNull String userId);
     void updateNickname(String nickname);
+    void updateUsername(String username);
     void updatePassword(UpdatePasswordDto dto);
     UserMeta getUserMeta(@NotNull String userId);
     UserMeta getUserMeta(@NotNull User user);

@@ -6,6 +6,7 @@ import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.model.vo.post.PostCover;
+import com.thss.androidbackend.model.vo.post.PostCoverList;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.post.PostService;
@@ -59,6 +60,18 @@ public class PostController {
         }
         PostCover cover = postService.getPostCover(id);
         return ResponseEntity.ok().body(cover);
+    }
+
+    @GetMapping(value = "/posts/all")
+    public @ResponseBody ResponseEntity<?> getAllPost() {
+        try {
+            System.out.println("enter");
+            PostCoverList postCoverList = postService.getAllPost();
+            System.out.println("finish");
+            return new ResponseEntity(postCoverList, new HttpHeaders(), HttpStatus.OK);
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/posts/{id}/uploadImage")

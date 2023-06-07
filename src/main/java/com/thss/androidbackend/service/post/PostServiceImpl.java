@@ -5,6 +5,7 @@ import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.post.PostCover;
+import com.thss.androidbackend.model.vo.post.PostCoverList;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
@@ -19,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -34,6 +36,33 @@ public class PostServiceImpl implements PostService {
         newPost.setContent(dto.content());
         newPost.setTitle(dto.title());
         postRepository.save(newPost);
+    }
+
+    public PostCoverList getAllPost() {
+        List<Post> allPost = postRepository.findAll();
+        List<PostCover> allPostCover = allPost.stream().map(post -> {
+            User creator = post.getCreator();
+            boolean liked = post.getLikes().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            return new PostCover(
+                    new UserMeta(
+                            creator.getId(),
+                            creator.getAvatarUrl(),
+                            creator.getNickname()
+                    ),
+                    post.getTitle(),
+                    post.getContent(),
+                    post.getImages(),
+                    post.getTag().stream().toList(),
+                    post.getLikes().size(),
+                    post.getComments().size(),
+                    post.getShares(),
+                    liked
+            );
+        }).collect(Collectors.toList());
+        PostCoverList postCoverList = new PostCoverList();
+        postCoverList.setAllPost(allPostCover);
+        return postCoverList;
     }
 
     @Override

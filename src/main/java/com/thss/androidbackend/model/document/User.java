@@ -45,5 +45,6 @@ public class User {
     private Set<Post> postList = new HashSet<>();
     private Set<String> interestedTags = new HashSet<>();
     private List<String> roles = new ArrayList<>();
+    private List<Post> collection = new ArrayList<>();
 
 }

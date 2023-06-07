@@ -4,6 +4,7 @@ import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
+import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.model.vo.post.PostCover;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
@@ -14,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,11 +41,11 @@ public class PostController {
     private final UserRepository userRepository;
     private final SecurityService securityService;
 
-    @PostMapping(value = "/posts")
+    @PostMapping(value = "/posts/create")
     public @ResponseBody ResponseEntity<?> post(@NotNull @RequestBody PostCreateDto dto) {
         try {
             postService.create(dto);
-            return ResponseEntity.created(URI.create("/posts")).body("Post created");
+            return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
@@ -60,6 +62,7 @@ public class PostController {
     }
 
     @RequestMapping(method = RequestMethod.POST, value = "/posts/{id}/uploadImage")
+
     public @ResponseBody ResponseEntity<?> addImage(@NotNull HttpServletRequest httpServletRequest, @PathVariable String id){
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
         Iterator<String> fileNames = multipartHttpServletRequest.getFileNames();

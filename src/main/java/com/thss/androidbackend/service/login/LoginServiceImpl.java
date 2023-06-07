@@ -44,15 +44,15 @@ public class LoginServiceImpl implements LoginService {
         if (passwordEncoder.matches(dto.password(),user.getPassword())) {
             List<String> roles = user.getRoles();
             if (roles.isEmpty()) roles = Collections.singletonList("ROLE_USER");
-            String token = JwtUtils.generateJwtToken(user.getUsername(), roles);
+            String token = JwtUtils.generateJwtToken(user.getId(), roles);
 
             user.setLastLoginTime(LocalDateTime.now());
             userRepository.save(user);
 
-            if(redisTemplate.hasKey(user.getUsername())) {
-                redisTemplate.delete(user.getUsername());
+            if(redisTemplate.hasKey(user.getId())) {
+                redisTemplate.delete(user.getId());
             }
-            redisTemplate.opsForValue().set(user.getUsername(), token, SecurityConfig.EXPIRATION_TIME);
+            redisTemplate.opsForValue().set(user.getId(), token, SecurityConfig.EXPIRATION_TIME);
 
             Authentication authentication = JwtUtils.getAuthentication(user, token);
             SecurityContextHolder.getContext().setAuthentication(authentication);

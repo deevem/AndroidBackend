@@ -106,6 +106,11 @@ public class UserServiceImpl implements UserService {
         user.setNickname(nickname);
         userRepo.save(user);
     }
+    public void updateUsername(String username) {
+        User user = securityService.getCurrentUser();
+        user.setUsername(username);
+        userRepo.save(user);
+    }
     public void updatePassword(UpdatePasswordDto dto) {
         User user = securityService.getCurrentUser();
         if(!passwordEncoder.matches(dto.oldPassword(), user.getPassword())){

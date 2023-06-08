@@ -7,6 +7,7 @@ import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
+import com.thss.androidbackend.model.vo.forum.PostCoverList;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.forum.PostService;
@@ -30,6 +31,7 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -59,7 +61,9 @@ public class PostController {
     public @ResponseBody ResponseEntity<?> getAllPost() {
         try {
             List<PostCover> postList = postService.getAllPost();
-            return new ResponseEntity(postList, new HttpHeaders(), HttpStatus.OK);
+            PostCoverList postCoverList = new PostCoverList();
+            postCoverList.setPostList(postList);
+            return new ResponseEntity(postCoverList, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

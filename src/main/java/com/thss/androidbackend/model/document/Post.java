@@ -30,6 +30,6 @@ public class Post {
     private List<User> likes = new ArrayList<>();
     private List<String> tag = new ArrayList<>();
     private int shares = 0;
-    private String location;
+    private String location = "";
 
 }

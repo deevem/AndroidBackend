@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Set;
 
 public record PostCover (
+    String id,
     UserMeta creator,
     Long createTime,
     String title,

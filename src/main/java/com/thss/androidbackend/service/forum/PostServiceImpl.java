@@ -78,6 +78,7 @@ public class PostServiceImpl implements PostService {
         PostCover cover;
         if(securityService.isAnonymous()){
             cover = new PostCover(
+                    post.getId(),
                     new UserMeta(
                             creator.getId(),
                             creator.getUsername(),
@@ -101,6 +102,7 @@ public class PostServiceImpl implements PostService {
             boolean collected = post.getCollects().stream().anyMatch(
                     u -> u.getId().equals(securityService.getCurrentUser().getId()));
             cover = new PostCover(
+                    post.getId(),
                     new UserMeta(
                             creator.getId(),
                             creator.getAvatarUrl(),
@@ -196,6 +198,7 @@ public class PostServiceImpl implements PostService {
             boolean collected = realPost.getCollects().stream().anyMatch(
                     u -> u.getId().equals(securityService.getCurrentUser().getId()));
             return new PostCover(
+                    realPost.getId(),
                     new UserMeta(
                             creator.getId(),
                             creator.getUsername(),

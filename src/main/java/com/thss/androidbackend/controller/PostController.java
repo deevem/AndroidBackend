@@ -126,6 +126,33 @@ public class PostController {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
     }
+    @PostMapping(value = "/posts/{id}/unlike")
+    public @ResponseBody ResponseEntity unLike(@NotNull @PathVariable String id) {
+        try {
+            postService.unLike(id);
+            return ResponseEntity.ok("unlike success");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @PostMapping(value = "/posts/{id}/collect")
+    public @ResponseBody ResponseEntity collect(@NotNull @PathVariable String id) {
+        try {
+            postService.collect(id);
+            return ResponseEntity.ok("collect success");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @PostMapping(value = "/posts/{id}/uncollect")
+    public @ResponseBody ResponseEntity unCollect(@NotNull @PathVariable String id) {
+        try {
+            postService.unCollect(id);
+            return ResponseEntity.ok("unCollect success");
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
     @PostMapping(value = "/posts/{id}/reply")
     public @ResponseBody ResponseEntity reply(@NotNull @PathVariable String id, @NotNull @RequestBody ReplyCreateDto dto) {
         try {

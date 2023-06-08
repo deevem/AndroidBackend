@@ -17,6 +17,9 @@ public interface PostService {
     PostDetail getPostDetail(String postId);
     PostDetail getPostDetail(Post post);
     void like(String postId);
+    void unLike(String postId);
+    void collect(String postId);
+    void unCollect(String postId);
     void addReply(String postId, Reply reply);
     void deleteReply(String postId, String replyId);
     Page<PostCover> generalSearch(String keyword, Pageable pageable);

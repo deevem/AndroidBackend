@@ -66,13 +66,50 @@ public class PostServiceImpl implements PostService {
         }
         User user = securityService.getCurrentUser();
         Post realPost = post.get();
-        LazyLoadingProxy lazyUser = (LazyLoadingProxy) post.get().getLikes();
-        Set<User> likes = (Set<User>) lazyUser.getTarget();
-        System.out.println(likes);
+        List<User> likes = realPost.getLikes();
         if(likes.stream().anyMatch(u -> u.getId().equals(user.getId()))){
             throw new CustomException(HttpStatus.BAD_REQUEST, "Already liked");
         } else {
             likes.add(user);
+        }
+        postRepository.save(realPost);
+    }
+
+    public void unLike(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(!realPost.getLikes().remove(user)){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Not liked yet");
+        }
+        postRepository.save(realPost);
+    }
+    public void collect(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(realPost.getCollects().stream().anyMatch(u -> u.equals(user))){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Already collected");
+        } else {
+            realPost.getCollects().add(user);
+        }
+        postRepository.save(realPost);
+    }
+    public void unCollect(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(!realPost.getCollects().remove(user)){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "not collected");
         }
         postRepository.save(realPost);
     }

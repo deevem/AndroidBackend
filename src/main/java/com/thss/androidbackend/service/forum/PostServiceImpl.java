@@ -37,7 +37,7 @@ public class PostServiceImpl implements PostService {
         newPost.setTitle(dto.title());
         newPost.setLocation(dto.location());
         postRepository.save(newPost);
-        user.getPostList().add(newPost);
+        user.getPostList().add(getPostCover(newPost));
         userRepository.save(user);
     }
 
@@ -106,8 +106,8 @@ public class PostServiceImpl implements PostService {
                     post.getId(),
                     new UserMeta(
                             creator.getId(),
-                            creator.getAvatarUrl(),
-                            creator.getNickname()
+                            creator.getUsername(),
+                            creator.getAvatarUrl()
                     ),
                     post.getCreateTime(),
                     post.getTitle(),
@@ -152,8 +152,8 @@ public class PostServiceImpl implements PostService {
                 detail = new PostDetail(
                         new UserMeta(
                                 creator.getId(),
-                                creator.getAvatarUrl(),
-                                creator.getNickname()
+                                creator.getUsername(),
+                                creator.getAvatarUrl()
                         ),
                         realPost.getTitle(),
                         realPost.getContent(),

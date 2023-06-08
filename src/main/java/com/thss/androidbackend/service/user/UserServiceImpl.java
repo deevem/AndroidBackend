@@ -43,7 +43,6 @@ public class UserServiceImpl implements UserService {
         user.setUsername(dto.username());
         user.setPassword(passwordEncoder.encode(dto.password()));
         user.setId(counterService.getNextSequence("customSequences"));
-        user.setNickname("thss" + user.getId().toString());
         return userRepo.insert(user);
     }
     @Override
@@ -54,7 +53,6 @@ public class UserServiceImpl implements UserService {
         User user = new User();
         user.setUsername(dto.email());
         user.setPassword(dto.password());
-        user.setNickname("thss" + user.getId().toString());
         return userRepo.insert(user);
     }
     @Override
@@ -82,8 +80,8 @@ public class UserServiceImpl implements UserService {
     public void subscribe(@NotNull String userId){
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         User self = securityService.getCurrentUser();
-        user.getSubscriberList().add(self);
-        self.getFollowList().add(user);
+        user.getSubscriberList().add(self.getMeta());
+        self.getFollowList().add(user.getMeta());
         userRepo.save(self);
         userRepo.save(user);
     }
@@ -103,7 +101,6 @@ public class UserServiceImpl implements UserService {
     }
     public void updateNickname(String nickname) {
         User user = securityService.getCurrentUser();
-        user.setNickname(nickname);
         userRepo.save(user);
     }
     public void updateUsername(String username) {
@@ -126,8 +123,8 @@ public class UserServiceImpl implements UserService {
     public UserMeta getUserMeta(User user){
         UserMeta meta = new UserMeta(
                 user.getId(),
-                user.getAvatarUrl(),
-                user.getNickname()
+                user.getUsername(),
+                user.getAvatarUrl()
         );
         return meta;
     }
@@ -141,7 +138,7 @@ public class UserServiceImpl implements UserService {
             detail = new UserDetail(
                     user.getId(),
                     user.getAvatarUrl(),
-                    user.getNickname(),
+                    user.getUsername(),
                     user.getDescription(),
                     user.getFollowList().size(),
                     user.getSubscriberList().size(),
@@ -149,10 +146,10 @@ public class UserServiceImpl implements UserService {
                     );
         } else {
             boolean liked = user.getSubscriberList().stream().anyMatch(
-                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+                    u -> u.userId().equals(securityService.getCurrentUser().getId()));
             detail = new UserDetail(
                     user.getId(),
-                    user.getNickname(),
+                    user.getUsername(),
                     user.getAvatarUrl(),
                     user.getDescription(),
                     user.getFollowList().size(),

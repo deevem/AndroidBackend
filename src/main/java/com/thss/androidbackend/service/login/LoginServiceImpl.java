@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -46,7 +47,7 @@ public class LoginServiceImpl implements LoginService {
             if (roles.isEmpty()) roles = Collections.singletonList("ROLE_USER");
             String token = JwtUtils.generateJwtToken(user.getId(), roles);
 
-            user.setLastLoginTime(LocalDateTime.now());
+            user.setLastLoginTime(LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli());
             userRepository.save(user);
 
             if(redisTemplate.hasKey(user.getId())) {

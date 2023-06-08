@@ -25,7 +25,6 @@ public class RegisterServiceImpl implements RegisterService {
         try {
             User user = userService.create(dto);
             RegisterResultVo result = new RegisterResultVo();
-            result.setNickname(user.getNickname());
             result.setUserID(user.getId());
             result.setUsername(user.getUsername());
             return result;
@@ -38,7 +37,6 @@ public class RegisterServiceImpl implements RegisterService {
     public RegisterResultVo register(@NotNull EmailRegisterDto dto) {
         User user = userService.create(dto);
         RegisterResultVo result = new RegisterResultVo();
-        result.setNickname(user.getNickname());
         result.setUserID(user.getId());
         result.setUsername(user.getUsername());
         return result;
@@ -48,7 +46,6 @@ public class RegisterServiceImpl implements RegisterService {
     public RegisterResultVo register(@NotNull PhoneRegisterDto dto) {
         User user = userService.create(dto);
         RegisterResultVo result = new RegisterResultVo();
-        result.setNickname(user.getNickname());
         result.setUserID(user.getId());
         result.setUsername(user.getUsername());
         return result;

@@ -1,5 +1,6 @@
 package com.thss.androidbackend.model.document;
 
+import com.thss.androidbackend.model.vo.forum.PostCover;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
@@ -31,5 +32,4 @@ public class Post {
     private List<String> tag = new ArrayList<>();
     private int shares = 0;
     private String location = "";
-
 }

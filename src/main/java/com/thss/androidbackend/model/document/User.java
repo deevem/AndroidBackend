@@ -40,14 +40,15 @@ public class User {
     private Long lastLoginTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private Boolean banned = false;
     @DBRef(lazy = true)
-    private List<UserMeta> followList = new ArrayList<>();
+    private List<User> followList = new ArrayList<>();
     @DBRef(lazy = true)
-    private List<UserMeta> subscriberList = new ArrayList<>();
-    @DBRef(lazy  = true)
-    private List<PostCover> postList = new ArrayList<>();
+    private List<User> subscriberList = new ArrayList<>();
+    @DBRef(lazy = true)
+    private List<Post> postList = new ArrayList<>();
     private List<String> interestedTags = new ArrayList<>();
     private List<String> roles = new ArrayList<>();
-    private List<PostCover> collection = new ArrayList<>();
+    @DBRef(lazy = true)
+    private List<Post> collection = new ArrayList<>();
 
     public UserMeta getMeta() {
         return new UserMeta(
@@ -55,5 +56,13 @@ public class User {
                 username,
                 avatarUrl
         );
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof User) {
+            return ((User) obj).getId().equals(this.getId());
+        }
+        return false;
     }
 }

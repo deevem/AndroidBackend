@@ -17,5 +17,4 @@ public interface PostService {
     void like(String postId);
     void addReply(String postId, Reply reply);
     void deleteReply(String postId, String replyId);
-    List<PostCover> getAllPost();
 }

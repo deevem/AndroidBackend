@@ -37,7 +37,7 @@ public class PostServiceImpl implements PostService {
         newPost.setTitle(dto.title());
         newPost.setLocation(dto.location());
         postRepository.save(newPost);
-        user.getPostList().add(getPostCover(newPost));
+        user.getPostList().add(newPost);
         userRepository.save(user);
     }
 
@@ -188,36 +188,5 @@ public class PostServiceImpl implements PostService {
         Post realPost = post.get();
         realPost.getComments().removeIf(reply -> reply.getId().equals(replyId));
         postRepository.save(realPost);
-    }
-
-    public List<PostCover> getAllPost() {
-        List<Post> allPost = postRepository.findAll();
-        List<PostCover> allPostCover = allPost.stream().map(realPost -> {
-            User creator = realPost.getCreator();
-            boolean liked = realPost.getLikes().stream().anyMatch(
-                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
-            boolean collected = realPost.getCollects().stream().anyMatch(
-                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
-            return new PostCover(
-                    realPost.getId(),
-                    new UserMeta(
-                            creator.getId(),
-                            creator.getUsername(),
-                            creator.getAvatarUrl()
-                    ),
-                    realPost.getCreateTime(),
-                    realPost.getTitle(),
-                    realPost.getContent(),
-                    realPost.getImages(),
-                    realPost.getTag(),
-                    realPost.getLikes().size(),
-                    realPost.getCollects().size(),
-                    realPost.getComments(),
-                    liked,
-                    collected,
-                    realPost.getLocation()
-            );
-        }).collect(Collectors.toList());
-        return allPostCover;
     }
 }

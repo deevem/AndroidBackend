@@ -80,8 +80,8 @@ public class UserServiceImpl implements UserService {
     public void subscribe(@NotNull String userId){
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         User self = securityService.getCurrentUser();
-        user.getSubscriberList().add(self.getMeta());
-        self.getFollowList().add(user.getMeta());
+        user.getSubscriberList().add(self);
+        self.getFollowList().add(user);
         userRepo.save(self);
         userRepo.save(user);
     }
@@ -146,7 +146,7 @@ public class UserServiceImpl implements UserService {
                     );
         } else {
             boolean liked = user.getSubscriberList().stream().anyMatch(
-                    u -> u.userId().equals(securityService.getCurrentUser().getId()));
+                    u -> u.equals(securityService.getCurrentUser()));
             detail = new UserDetail(
                     user.getId(),
                     user.getUsername(),

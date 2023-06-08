@@ -17,6 +17,8 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpHeaders;
@@ -58,12 +60,16 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts")
-    public @ResponseBody ResponseEntity<?> getAllPost() {
+    public @ResponseBody ResponseEntity<?> getAllPost(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                      @RequestParam(value = "size", defaultValue = "10") int size
+    ) {
         try {
-            List<PostCover> postList = postService.getAllPost();
-            PostCoverList postCoverList = new PostCoverList();
-            postCoverList.setPostList(postList);
-            return new ResponseEntity(postCoverList, new HttpHeaders(), HttpStatus.OK);
+            List<PostCover> postList = postRepository.findAll()
+                    .stream().map(post -> postService.getPostCover(post)).toList()
+                    .subList(page * size, Math.min((page + 1) * size, postRepository.findAll().size()));
+            Pageable pageable = Pageable.ofSize(size).withPage(page);
+            Page<PostCover> postCoverPage = new PageImpl<>(postList, pageable, postList.size());
+            return new ResponseEntity(postCoverPage, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

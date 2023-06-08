@@ -6,8 +6,10 @@ import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.service.security.SecurityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
+@Service
 public class ReplyServiceImpl implements ReplyService{
     private final ReplyRepository replyRepository;
     private final SecurityService securityService;

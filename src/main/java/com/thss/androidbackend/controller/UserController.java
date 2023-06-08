@@ -76,10 +76,10 @@ public class UserController {
     @PostMapping("/users/update/avatar")
     ResponseEntity<?> updateAvatar(@NotNull HttpServletRequest httpServletRequest){
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
-        MultipartFile avatar = multipartHttpServletRequest.getFile("avatar");
+        MultipartFile avatar = multipartHttpServletRequest.getFile("image");
         String name = imageService.uploadImage(avatar);
         if(name == null) return ResponseEntity.badRequest().body("upload avatar failed");
-        userService.updateAvatar(name);
+        userService.updateAvatar("http://183.172.141.89:8080/image/" + name);
         return ResponseEntity.ok().body("update avatar success");
     }
     @PostMapping("/users/update/password")

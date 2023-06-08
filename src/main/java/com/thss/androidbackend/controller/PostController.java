@@ -5,8 +5,6 @@ import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.TokenVo;
-import com.thss.androidbackend.model.vo.post.PostCover;
-import com.thss.androidbackend.model.vo.post.PostCoverList;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.repository.PostRepository;
@@ -47,16 +45,6 @@ public class PostController {
     private final UserRepository userRepository;
     private final SecurityService securityService;
 
-    @PostMapping(value = "/posts/create")
-    public @ResponseBody ResponseEntity<?> post(@NotNull @RequestBody PostCreateDto dto) {
-        try {
-            postService.create(dto);
-            return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
-        } catch (CustomException e) {
-            return new ResponseEntity(e.getMessage(), e.getStatus());
-        }
-    }
-
     @GetMapping(value = "/posts/{id}/cover")
     public @ResponseBody ResponseEntity postCover(@PathVariable String id) {
         Optional<Post> post = postRepository.findById(id);
@@ -67,11 +55,21 @@ public class PostController {
         return ResponseEntity.ok().body(cover);
     }
 
-    @GetMapping(value = "/posts/all")
+    @GetMapping(value = "/posts")
     public @ResponseBody ResponseEntity<?> getAllPost() {
         try {
             List<PostCover> postList = postService.getAllPost();
             return new ResponseEntity(postList, new HttpHeaders(), HttpStatus.OK);
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+
+    @PostMapping(value = "/posts")
+    public @ResponseBody ResponseEntity<?> post(@NotNull @RequestBody PostCreateDto dto) {
+        try {
+            postService.create(dto);
+            return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

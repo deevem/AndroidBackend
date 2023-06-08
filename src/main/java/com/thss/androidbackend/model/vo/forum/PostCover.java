@@ -1,4 +1,4 @@
-package com.thss.androidbackend.model.vo.post;
+package com.thss.androidbackend.model.vo.forum;
 
 import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.document.User;

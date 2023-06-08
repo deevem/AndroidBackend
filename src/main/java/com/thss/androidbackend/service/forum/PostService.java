@@ -6,6 +6,8 @@ import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostDetail;
 
+import java.util.List;
+
 public interface PostService {
     void create(PostCreateDto dto);
     PostCover getPostCover(String postId);
@@ -15,4 +17,5 @@ public interface PostService {
     void like(String postId);
     void addReply(String postId, Reply reply);
     void deleteReply(String postId, String replyId);
+    List<PostCover> getAllPost();
 }

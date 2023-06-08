@@ -17,8 +17,10 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -81,17 +83,22 @@ public class PostServiceImpl implements PostService {
                             creator.getUsername(),
                             creator.getAvatarUrl()
                     ),
+                    post.getCreateTime(),
                     post.getTitle(),
                     post.getContent(),
                     post.getImages(),
-                    post.getTag().stream().toList(),
+                    post.getTag(),
                     post.getLikes().size(),
-                    post.getComments().size(),
-                    post.getShares(),
-                    false
+                    post.getCollects().size(),
+                    post.getComments(),
+                    false,
+                    false,
+                    post.getLocation()
             );
         } else {
             boolean liked = post.getLikes().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            boolean collected = post.getCollects().stream().anyMatch(
                     u -> u.getId().equals(securityService.getCurrentUser().getId()));
             cover = new PostCover(
                     new UserMeta(
@@ -99,14 +106,17 @@ public class PostServiceImpl implements PostService {
                             creator.getAvatarUrl(),
                             creator.getNickname()
                     ),
+                    post.getCreateTime(),
                     post.getTitle(),
                     post.getContent(),
                     post.getImages(),
-                    post.getTag().stream().toList(),
+                    post.getTag(),
                     post.getLikes().size(),
-                    post.getComments().size(),
-                    post.getShares(),
-                    liked
+                    post.getCollects().size(),
+                    post.getComments(),
+                    liked,
+                    collected,
+                    post.getLocation()
             );
         }
 
@@ -175,5 +185,35 @@ public class PostServiceImpl implements PostService {
         Post realPost = post.get();
         realPost.getComments().removeIf(reply -> reply.getId().equals(replyId));
         postRepository.save(realPost);
+    }
+
+    public List<PostCover> getAllPost() {
+        List<Post> allPost = postRepository.findAll();
+        List<PostCover> allPostCover = allPost.stream().map(realPost -> {
+            User creator = realPost.getCreator();
+            boolean liked = realPost.getLikes().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            boolean collected = realPost.getCollects().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            return new PostCover(
+                    new UserMeta(
+                            creator.getId(),
+                            creator.getUsername(),
+                            creator.getAvatarUrl()
+                    ),
+                    realPost.getCreateTime(),
+                    realPost.getTitle(),
+                    realPost.getContent(),
+                    realPost.getImages(),
+                    realPost.getTag(),
+                    realPost.getLikes().size(),
+                    realPost.getCollects().size(),
+                    realPost.getComments(),
+                    liked,
+                    collected,
+                    realPost.getLocation()
+            );
+        }).collect(Collectors.toList());
+        return allPostCover;
     }
 }

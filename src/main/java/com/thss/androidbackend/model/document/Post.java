@@ -7,6 +7,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.*;
 
 @Document("posts")
@@ -16,18 +17,18 @@ public class Post {
     @Id private String id;
     @DBRef(lazy = true)
     private User creator;
-    private LocalDateTime createTime = LocalDateTime.now();
-    private LocalDateTime lastUpdateTime = LocalDateTime.now();
+    private Long createTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
+    private Long lastUpdateTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private String title;
     private String content;
     @DBRef(lazy = true)
     private List<Reply> comments = new ArrayList<>();
     private List<String> images = new ArrayList<>();
     @DBRef(lazy = true)
-    private Set<User> favorites = new HashSet<>();
+    private List<User> collects = new ArrayList<>();
     @DBRef(lazy = true)
-    private Set<User> likes = new HashSet<>();
-    private Set<String> tag = new HashSet<>();
+    private List<User> likes = new ArrayList<>();
+    private List<String> tag = new ArrayList<>();
     private int shares = 0;
     private String location;
 

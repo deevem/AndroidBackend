@@ -65,10 +65,8 @@ public class PostController {
     @GetMapping(value = "/posts/all")
     public @ResponseBody ResponseEntity<?> getAllPost() {
         try {
-            System.out.println("enter");
-            PostCoverList postCoverList = postService.getAllPost();
-            System.out.println("finish");
-            return new ResponseEntity(postCoverList, new HttpHeaders(), HttpStatus.OK);
+            List<PostCover> postList = postService.getAllPost();
+            return new ResponseEntity(postList, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

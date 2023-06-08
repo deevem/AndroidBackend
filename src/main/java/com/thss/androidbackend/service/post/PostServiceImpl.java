@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.ZoneOffset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -38,31 +39,34 @@ public class PostServiceImpl implements PostService {
         postRepository.save(newPost);
     }
 
-    public PostCoverList getAllPost() {
+    public List<PostCover> getAllPost() {
         List<Post> allPost = postRepository.findAll();
-        List<PostCover> allPostCover = allPost.stream().map(post -> {
-            User creator = post.getCreator();
-            boolean liked = post.getLikes().stream().anyMatch(
+        List<PostCover> allPostCover = allPost.stream().map(realPost -> {
+            User creator = realPost.getCreator();
+            boolean liked = realPost.getLikes().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            boolean collected = realPost.getCollects().stream().anyMatch(
                     u -> u.getId().equals(securityService.getCurrentUser().getId()));
             return new PostCover(
                     new UserMeta(
                             creator.getId(),
-                            creator.getAvatarUrl(),
-                            creator.getNickname()
+                            creator.getUsername(),
+                            creator.getAvatarUrl()
                     ),
-                    post.getTitle(),
-                    post.getContent(),
-                    post.getImages(),
-                    post.getTag().stream().toList(),
-                    post.getLikes().size(),
-                    post.getComments().size(),
-                    post.getShares(),
-                    liked
+                    realPost.getCreateTime(),
+                    realPost.getTitle(),
+                    realPost.getContent(),
+                    realPost.getImages(),
+                    realPost.getTag(),
+                    realPost.getLikes().size(),
+                    realPost.getCollects().size(),
+                    realPost.getComments(),
+                    liked,
+                    collected,
+                    realPost.getLocation()
             );
         }).collect(Collectors.toList());
-        PostCoverList postCoverList = new PostCoverList();
-        postCoverList.setAllPost(allPostCover);
-        return postCoverList;
+        return allPostCover;
     }
 
     @Override
@@ -81,32 +85,40 @@ public class PostServiceImpl implements PostService {
                             creator.getUsername(),
                             creator.getAvatarUrl()
                     ),
+                    realPost.getCreateTime(),
                     realPost.getTitle(),
                     realPost.getContent(),
                     realPost.getImages(),
-                    realPost.getTag().stream().toList(),
+                    realPost.getTag(),
                     realPost.getLikes().size(),
-                    realPost.getComments().size(),
-                    realPost.getShares(),
-                    false
+                    realPost.getCollects().size(),
+                    realPost.getComments(),
+                    false,
+                    false,
+                    realPost.getLocation()
             );
         } else {
             boolean liked = realPost.getLikes().stream().anyMatch(
                     u -> u.getId().equals(securityService.getCurrentUser().getId()));
+            boolean collected = realPost.getCollects().stream().anyMatch(
+                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
             cover = new PostCover(
                     new UserMeta(
                             creator.getId(),
-                            creator.getAvatarUrl(),
-                            creator.getNickname()
+                            creator.getUsername(),
+                            creator.getAvatarUrl()
                     ),
+                    realPost.getCreateTime(),
                     realPost.getTitle(),
                     realPost.getContent(),
                     realPost.getImages(),
-                    realPost.getTag().stream().toList(),
+                    realPost.getTag(),
                     realPost.getLikes().size(),
-                    realPost.getComments().size(),
-                    realPost.getShares(),
-                    liked
+                    realPost.getCollects().size(),
+                    realPost.getComments(),
+                    liked,
+                    collected,
+                    realPost.getLocation()
             );
         }
 

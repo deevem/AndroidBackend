@@ -9,9 +9,8 @@ import java.util.List;
 @Document
 public class Reply {
     private User creator;
-    private List<User> likes = List.of();
-    private List<Reply> comments = List.of();
     private String content;
-
-
+    private Long createTime;
+    private List<User> likes;
+    private List<Reply> comments;
 }

@@ -6,6 +6,7 @@ import java.io.Serializable;
 
 public record PostCreateDto(
     String title,
-    String content
+    String content,
+    String location
 ) implements Serializable {
 }

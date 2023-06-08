@@ -17,9 +17,7 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -61,11 +59,18 @@ public class PostController {
 
     @GetMapping(value = "/posts")
     public @ResponseBody ResponseEntity<?> getAllPost(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                      @RequestParam(value = "size", defaultValue = "10") int size
+                                                      @RequestParam(value = "size", defaultValue = "10") int size,
+                                                      @RequestParam(value = "sort", defaultValue = "createTime") String sort,
+                                                      @RequestParam(value = "direction", defaultValue = "DESC") String direction
     ) {
         try {
-            Pageable pageable = Pageable.ofSize(size).withPage(page);
-            Page<PostCover> postPage = postRepository.findAll(pageable).map(postService::getPostCover);
+            Sort.Direction dir;
+            if (direction.equals("ASC")) {
+                dir = Sort.Direction.ASC;
+            } else {
+                dir = Sort.Direction.DESC;
+            }
+            Page<PostCover> postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by(dir, sort))).map(postService::getPostCover);
             return new ResponseEntity(postPage, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());

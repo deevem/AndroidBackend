@@ -4,7 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.thss.androidbackend.model.document.ChatMessage;
+import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.repository.ChatMessageRepository;
+import com.thss.androidbackend.repository.UserRepository;
+import com.thss.androidbackend.service.security.JwtUtils;
+import com.thss.androidbackend.service.security.SecurityService;
+import com.thss.androidbackend.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
@@ -21,6 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 public class ChatWebsocketHandler extends TextWebSocketHandler {
 
     private final ChatMessageRepository chatMessageRepository;
+    private final UserRepository userRepository;
 
     class MessageToClient {
         private String senderId;
@@ -54,7 +60,6 @@ public class ChatWebsocketHandler extends TextWebSocketHandler {
     private final HashMap<String, String> websocketSessionMapping = new HashMap<>();
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        System.out.println("test");
         sessions.add(session);
     }
 
@@ -67,11 +72,12 @@ public class ChatWebsocketHandler extends TextWebSocketHandler {
             String json = message.getPayload();
             JsonNode jsonNode = objectMapper.readTree(json);
             System.out.println(jsonNode);
-
             String operation = jsonNode.get("operation").asText();
             if (operation.equals("register")) {
-                String senderId = jsonNode.get("senderId").asText();
-                websocketSessionMapping.put(senderId, session.getId());
+                String token = jsonNode.get("token").asText().substring(7);
+                String userId = JwtUtils.parse(token).getSubject();
+                User currentUser = userRepository.findById(userId).get();
+                websocketSessionMapping.put(currentUser.getId(), session.getId());
             } else if (operation.equals("send")) {
                 String senderId = jsonNode.get("senderId").asText();
                 String receiverId = jsonNode.get("receiverId").asText();

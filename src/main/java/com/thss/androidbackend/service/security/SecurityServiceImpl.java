@@ -16,7 +16,7 @@ public class SecurityServiceImpl implements SecurityService {
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
     }
     public String getCurrentUsername() {
-        return getCurrentUser().getUsername();
+        return SecurityContextHolder.getContext().toString();
     }
     public boolean isAnonymous() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

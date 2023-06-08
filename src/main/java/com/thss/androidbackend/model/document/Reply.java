@@ -12,10 +12,12 @@ import java.util.List;
 public class Reply {
     @Id
     private String id;
+    @DBRef(lazy = true)
     private User creator;
     @DBRef(lazy = true)
     private List<User> likes = List.of();
     @DBRef(lazy = true)
     private List<Reply> comments = List.of();
     private String content;
+    private Long createTime;
 }

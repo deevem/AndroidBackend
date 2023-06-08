@@ -12,6 +12,7 @@ import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.forum.PostService;
 import com.thss.androidbackend.service.forum.ReplyService;
+import com.thss.androidbackend.service.image.ImageService;
 import com.thss.androidbackend.service.security.SecurityService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,10 +32,8 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RepositoryRestController
 @RequiredArgsConstructor
@@ -46,6 +45,8 @@ public class PostController {
     private final ReplyService replyService;
     private final UserRepository userRepository;
     private final SecurityService securityService;
+    private final ImageService imageService;
+
 
     @GetMapping(value = "/posts/{id}/cover")
     public @ResponseBody ResponseEntity postCover(@PathVariable String id) {
@@ -70,9 +71,17 @@ public class PostController {
     }
 
     @PostMapping(value = "/posts")
-    public @ResponseBody ResponseEntity<?> post(@NotNull @RequestBody PostCreateDto dto) {
+    public @ResponseBody ResponseEntity<?> post(@NotNull HttpServletRequest httpServletRequest) {
         try {
-            postService.create(dto);
+            MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
+            List<MultipartFile> multipartFiles = multipartHttpServletRequest.getFiles("image");
+            List<String> images = multipartFiles.stream().map(file -> {
+                String name = imageService.uploadImage(file);
+                return "http://183.172.178.133:8080/image/" + name;
+            }).collect(Collectors.toList());
+            List<String> tags = Arrays.stream(multipartHttpServletRequest.getParameter("tag").split(",")).toList();
+            postService.create(multipartHttpServletRequest.getParameter("title"), multipartHttpServletRequest.getParameter("content"), images,
+                    tags, multipartHttpServletRequest.getParameter("location"));
             return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());

@@ -9,7 +9,7 @@ import com.thss.androidbackend.model.vo.forum.PostDetail;
 import java.util.List;
 
 public interface PostService {
-    void create(PostCreateDto dto);
+    void create(String title, String content, List<String> images, List<String> tag, String location);
     PostCover getPostCover(String postId);
     PostCover getPostCover(Post post);
     PostDetail getPostDetail(String postId);

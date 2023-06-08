@@ -29,13 +29,15 @@ public class PostServiceImpl implements PostService {
     private final SecurityService securityService;
     private final UserRepository userRepository;
 
-    public void create(PostCreateDto dto){
+    public void create(String title, String content, List<String> images, List<String> tag, String location){
         Post newPost = new Post();
         User user = securityService.getCurrentUser();
         newPost.setCreator(user);
-        newPost.setContent(dto.content());
-        newPost.setTitle(dto.title());
-        newPost.setLocation(dto.location());
+        newPost.setTitle(title);
+        newPost.setContent(content);
+        newPost.setImages(images);
+        newPost.setTag(tag);
+        newPost.setLocation(location);
         postRepository.save(newPost);
         user.getPostList().add(getPostCover(newPost));
         userRepository.save(user);

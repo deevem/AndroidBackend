@@ -13,6 +13,8 @@ import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.security.SecurityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -188,5 +190,12 @@ public class PostServiceImpl implements PostService {
         Post realPost = post.get();
         realPost.getComments().removeIf(reply -> reply.getId().equals(replyId));
         postRepository.save(realPost);
+    }
+
+    @Override
+    public Page<PostCover> generalSearch(String keyword, Pageable pageable) {
+        Page<Post> posts = postRepository.findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(keyword, keyword, keyword, pageable);
+        Page<PostCover> postCovers = posts.map(this::getPostCover);
+        return postCovers;
     }
 }

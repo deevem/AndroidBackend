@@ -64,12 +64,9 @@ public class PostController {
                                                       @RequestParam(value = "size", defaultValue = "10") int size
     ) {
         try {
-            List<PostCover> postList = postRepository.findAll()
-                    .stream().map(post -> postService.getPostCover(post)).toList()
-                    .subList(page * size, Math.min((page + 1) * size, postRepository.findAll().size()));
             Pageable pageable = Pageable.ofSize(size).withPage(page);
-            Page<PostCover> postCoverPage = new PageImpl<>(postList, pageable, postList.size());
-            return new ResponseEntity(postCoverPage, new HttpHeaders(), HttpStatus.OK);
+            Page<PostCover> postPage = postRepository.findAll(pageable).map(postService::getPostCover);
+            return new ResponseEntity(postPage, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
@@ -85,6 +82,7 @@ public class PostController {
         }
     }
 
+    //TODO: to be fixed
     @RequestMapping(method = RequestMethod.POST, value = "/posts/{id}/uploadImage")
     public @ResponseBody ResponseEntity<?> addImage(@NotNull HttpServletRequest httpServletRequest, @PathVariable String id){
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
@@ -156,6 +154,18 @@ public class PostController {
             List<Reply> replies = postService.getPostDetail(id).replies();
             Pageable pageable = Pageable.ofSize(size).withPage(page);
             return ResponseEntity.ok(replies);
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+    }
+    @GetMapping(value = "/posts/search")
+    public @ResponseBody ResponseEntity search(@RequestParam(value = "page", defaultValue = "0") int page,
+                                               @RequestParam(value = "size", defaultValue = "10") int size,
+                                               @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+        try {
+            Pageable pageable = Pageable.ofSize(size).withPage(page);
+            Page<PostCover> postPage = postService.generalSearch(keyword, pageable);
+            return new ResponseEntity(postPage, new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

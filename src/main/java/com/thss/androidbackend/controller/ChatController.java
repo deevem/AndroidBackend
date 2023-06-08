@@ -65,14 +65,14 @@ public class ChatController {
         List<ChatMessage> allMessage = chatMessageRepository.findAll();
         HashMap<String, ChatVo> hashMap = new HashMap<>();
 
-        UserMeta curruentUserMeta = new UserMeta(currentUserId, currentUser.getAvatarUrl(), currentUser.getUsername());
+        UserMeta curruentUserMeta = new UserMeta(currentUserId, currentUser.getUsername(), currentUser.getAvatarUrl());
         for (ChatMessage chatMessage : allMessage) {
             if (chatMessage.getSenderId().equals(currentUserId)) {
                 String receiverId = chatMessage.getReceiverId();
                 Optional<User> receiver = userRepository.findById(receiverId);
                 if (receiver.isEmpty())
                     continue;
-                UserMeta receiverUserMeta = new UserMeta(receiverId, receiver.get().getAvatarUrl(), receiver.get().getUsername());
+                UserMeta receiverUserMeta = new UserMeta(receiverId, receiver.get().getUsername(), receiver.get().getAvatarUrl());
 
                 if (!hashMap.containsKey(receiverId)) {
                     hashMap.put(receiverId, new ChatVo(curruentUserMeta, receiverUserMeta, new ArrayList<>()));
@@ -83,7 +83,7 @@ public class ChatController {
                 Optional<User> sender = userRepository.findById(senderId);
                 if (sender.isEmpty())
                     continue;
-                UserMeta receiverUserMeta = new UserMeta(senderId, sender.get().getAvatarUrl(), sender.get().getUsername());
+                UserMeta receiverUserMeta = new UserMeta(senderId, sender.get().getUsername(), sender.get().getAvatarUrl());
 
                 if (!hashMap.containsKey(senderId)) {
                     hashMap.put(senderId, new ChatVo(curruentUserMeta, receiverUserMeta, new ArrayList<>()));

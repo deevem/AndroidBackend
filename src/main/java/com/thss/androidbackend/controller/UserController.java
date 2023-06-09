@@ -48,6 +48,15 @@ public class UserController {
         return ResponseEntity.ok().body(currentUser);
     }
 
+    @GetMapping("/user/{id}")
+    ResponseEntity getUserById(@PathVariable String id) {
+        User user = userRepository.findById(id).get();
+        if (user != null) {
+            return ResponseEntity.ok().body(user);
+        }
+        return ResponseEntity.badRequest().body("find user by id failed");
+    }
+
     @PostMapping("/users/{id}/subscribe")
     ResponseEntity<?> subscribe(@PathVariable String id){
         userService.subscribe(id);

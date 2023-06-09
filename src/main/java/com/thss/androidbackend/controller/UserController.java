@@ -2,13 +2,16 @@ package com.thss.androidbackend.controller;
 
 
 import com.thss.androidbackend.Global;
+import com.thss.androidbackend.model.document.NotificationMessage;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.user.UpdateDescriptionDto;
 import com.thss.androidbackend.model.dto.user.UpdateNicknameDto;
 import com.thss.androidbackend.model.dto.user.UpdatePasswordDto;
 import com.thss.androidbackend.model.dto.user.UpdateUsernameDto;
+import com.thss.androidbackend.model.vo.NotificationVo;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.user.UserMeta;
+import com.thss.androidbackend.repository.NotificationRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.image.ImageService;
 import com.thss.androidbackend.service.forum.PostService;
@@ -126,5 +129,12 @@ public class UserController {
         List<UserMeta> subscribeList = user.get().getFollowList().stream().map(User::getMeta).collect(Collectors.toList())
                 .subList(page * size, Math.min((page + 1) * size, user.get().getFollowList().size()));
         return ResponseEntity.ok().body(subscribeList);
+    }
+
+    @GetMapping("/users/notifications")
+    ResponseEntity getNotificationList() {
+        User user = securityService.getCurrentUser();
+        List<NotificationVo> notificationMessageList = userService.getNotificationList(user.getId()).stream().map(NotificationMessage::getNotificationVo).toList();
+        return ResponseEntity.ok().body(notificationMessageList);
     }
 }

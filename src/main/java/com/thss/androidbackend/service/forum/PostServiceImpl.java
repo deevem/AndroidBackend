@@ -11,6 +11,7 @@ import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.repository.UserRepository;
+import com.thss.androidbackend.service.notification.NotificationService;
 import com.thss.androidbackend.service.security.SecurityService;
 import com.thss.androidbackend.websocket.ChatWebsocketHandler;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class PostServiceImpl implements PostService {
     private final SecurityService securityService;
     private final UserRepository userRepository;
     private final ChatWebsocketHandler chatWebsocketHandler;
+    private final NotificationService notificationService;
 
     public void create(String title, String content, List<String> images, List<String> tag, String location){
         Post newPost = new Post();
@@ -45,6 +47,8 @@ public class PostServiceImpl implements PostService {
         postRepository.save(newPost);
         user.getPostList().add(newPost);
         userRepository.save(user);
+
+        user.getFollowList().forEach(it -> notificationService.createNewPostNotification(it, user, newPost));
     }
 
     public PostCover getPostCover(String postId) {
@@ -77,6 +81,8 @@ public class PostServiceImpl implements PostService {
             likes.add(user);
         }
         postRepository.save(realPost);
+
+        notificationService.createLikeNotification(realPost.getCreator(), user, realPost);
     }
 
     public void unLike(String postId){
@@ -224,6 +230,8 @@ public class PostServiceImpl implements PostService {
         realPost.getComments().add(reply);
         postRepository.save(realPost);
         chatWebsocketHandler.sendMessage();
+
+        notificationService.createReplyNotification(realPost.getCreator(), reply.getCreator(), realPost);
     }
 
     @Override

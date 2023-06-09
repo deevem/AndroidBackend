@@ -12,5 +12,5 @@ import java.util.List;
 
 public interface PostRepository extends MongoRepository<Post, String> {
     @Query
-    Page<Post> findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(String title, String content, String tag, Pageable pageable);
+    List<Post> findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(String title, String content, String tag);
 }

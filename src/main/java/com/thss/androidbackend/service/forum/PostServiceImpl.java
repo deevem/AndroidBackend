@@ -230,9 +230,8 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public Page<PostCover> generalSearch(String keyword, Pageable pageable) {
-        Page<Post> posts = postRepository.findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(keyword, keyword, keyword, pageable);
-        Page<PostCover> postCovers = posts.map(this::getPostCover);
-        return postCovers;
+    public List<Post> generalSearch(String keyword) {
+        List<Post> posts = postRepository.findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(keyword, keyword, keyword);
+        return posts;
     }
 }

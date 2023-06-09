@@ -4,7 +4,6 @@ import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
-import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostCoverList;
@@ -35,6 +34,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RepositoryRestController
 @RequiredArgsConstructor
@@ -58,9 +58,7 @@ public class PostController {
     }
 
     @GetMapping(value = "/posts")
-    public @ResponseBody ResponseEntity<?> getAllPost(@RequestParam(value = "page", defaultValue = "0") int page,
-                                                      @RequestParam(value = "size", defaultValue = "10") int size,
-                                                      @RequestParam(value = "sort", defaultValue = "createTime") String sort,
+    public @ResponseBody ResponseEntity<?> getAllPost(@RequestParam(value = "sort", defaultValue = "createTime") String sort,
                                                       @RequestParam(value = "direction", defaultValue = "DESC") String direction
     ) {
         try {
@@ -70,8 +68,11 @@ public class PostController {
             } else {
                 dir = Sort.Direction.DESC;
             }
-            Page<PostCover> postPage = postRepository.findAll(PageRequest.of(page, size, Sort.by(dir, sort))).map(postService::getPostCover);
-            return new ResponseEntity(postPage, new HttpHeaders(), HttpStatus.OK);
+            PostCoverList postPage = new PostCoverList(
+                    postRepository.findAll(Sort.by(dir, sort)).stream().map(post -> postService.getPostCover(post.getId()))
+                            .collect(Collectors.toList())
+            );
+            return ResponseEntity.ok(postPage);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
@@ -184,20 +185,17 @@ public class PostController {
                                                  @RequestParam(value = "size", defaultValue = "10") int size) {
         try {
             List<Reply> replies = postService.getPostDetail(id).replies();
-            Pageable pageable = Pageable.ofSize(size).withPage(page);
             return ResponseEntity.ok(replies);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
     }
     @GetMapping(value = "/posts/search")
-    public @ResponseBody ResponseEntity search(@RequestParam(value = "page", defaultValue = "0") int page,
-                                               @RequestParam(value = "size", defaultValue = "10") int size,
-                                               @RequestParam(value = "keyword", defaultValue = "") String keyword) {
+    public @ResponseBody ResponseEntity search(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
         try {
-            Pageable pageable = Pageable.ofSize(size).withPage(page);
-            Page<PostCover> postPage = postService.generalSearch(keyword, pageable);
-            return new ResponseEntity(postPage, new HttpHeaders(), HttpStatus.OK);
+            List<PostCover> postPage = postService.generalSearch(keyword).stream().map(postService::getPostCover)
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(new PostCoverList(postPage));
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

@@ -22,5 +22,5 @@ public interface PostService {
     void unCollect(String postId);
     void addReply(String postId, Reply reply);
     void deleteReply(String postId, String replyId);
-    Page<PostCover> generalSearch(String keyword, Pageable pageable);
+    List<Post> generalSearch(String keyword);
 }

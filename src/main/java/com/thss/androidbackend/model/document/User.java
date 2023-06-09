@@ -50,6 +50,8 @@ public class User {
     private List<String> roles = new ArrayList<>();
     @DBRef(lazy = true)
     private List<Post> collection = new ArrayList<>();
+    @DBRef(lazy = true)
+    private List<User> blackList = new ArrayList<>();
 
     public UserMeta getMeta() {
         return new UserMeta(

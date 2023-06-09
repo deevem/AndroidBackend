@@ -81,6 +81,7 @@ public class PostController {
 //                    .filter(post -> post.getCreator().equals(self))
                     .map(postService::getPostCover)
                     .toList();
+            System.out.println(postCovers);
             PostCoverList postPage = new PostCoverList(postCovers);
             return ResponseEntity.ok(postPage);
         } catch (CustomException e) {

@@ -27,6 +27,7 @@ public class NotificationMessage {
     private boolean readFlag;
     public NotificationVo getNotificationVo() {
         return new NotificationVo(
+                id,
                 userToNotify.getMeta(),
                 creator.getMeta(),
                 route,

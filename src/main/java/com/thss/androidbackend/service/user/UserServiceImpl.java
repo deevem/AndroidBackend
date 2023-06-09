@@ -1,11 +1,13 @@
 package com.thss.androidbackend.service.user;
 
 import com.thss.androidbackend.model.document.NotificationMessage;
+import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.register.EmailRegisterDto;
 import com.thss.androidbackend.model.dto.register.PhoneRegisterDto;
 import com.thss.androidbackend.model.dto.register.UsernameRegisterDto;
 import com.thss.androidbackend.model.dto.user.UpdatePasswordDto;
+import com.thss.androidbackend.model.vo.forum.ReplyVo;
 import com.thss.androidbackend.model.vo.user.UserDetail;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.model.vo.user.UserVo;

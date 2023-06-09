@@ -141,7 +141,7 @@ public class PostServiceImpl implements PostService {
                     post.getTag(),
                     post.getLikes().size(),
                     post.getCollects().size(),
-                    post.getComments(),
+                    post.getComments().stream().map(Reply::getReplyVo).toList(),
                     false,
                     false,
                     post.getLocation()
@@ -165,7 +165,7 @@ public class PostServiceImpl implements PostService {
                     post.getTag(),
                     post.getLikes().size(),
                     post.getCollects().size(),
-                    post.getComments(),
+                    post.getComments().stream().map(Reply::getReplyVo).toList(),
                     liked,
                     collected,
                     post.getLocation()

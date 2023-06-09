@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.List;
 
 public record NotificationVo(
+    String id,
     UserMeta targetUserMeta,
     UserMeta sourceUserMeta,
     String route,

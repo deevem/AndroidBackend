@@ -31,7 +31,7 @@ public class NotificationServiceImpl implements NotificationService {
             sourceUser,
             "Liked",
             String.format("User %s liked your post: %s", sourceUser.getUsername(), likedPost.getTitle()),
-            ""
+            "BlogScreen/?id=" + likedPost.getId()
         );
     }
 
@@ -42,7 +42,7 @@ public class NotificationServiceImpl implements NotificationService {
                 sourceUser,
                 "Reply",
                 String.format("User %s replied your post: %s", sourceUser.getUsername(), likedPost.getTitle()),
-                ""
+                "BlogScreen/?id=" + likedPost.getId()
         );
     }
 
@@ -53,7 +53,7 @@ public class NotificationServiceImpl implements NotificationService {
                 sourceUser,
                 "Following",
                 String.format("Subscribed user %s created a new post: %s", sourceUser.getUsername(), likedPost.getTitle()),
-                ""
+                "BlogScreen/?id=" + likedPost.getId()
         );
     }
 }

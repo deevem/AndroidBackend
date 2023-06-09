@@ -21,7 +21,7 @@ public record PostCover (
     List<String> tags,
     int likesNumber,
     int collectedNumber,
-    List<Reply> comments,
+    List<ReplyVo> comments,
     boolean liked,
     boolean collected,
     String location

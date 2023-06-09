@@ -8,6 +8,7 @@ import com.thss.androidbackend.model.dto.user.UpdateDescriptionDto;
 import com.thss.androidbackend.model.dto.user.UpdateNicknameDto;
 import com.thss.androidbackend.model.dto.user.UpdatePasswordDto;
 import com.thss.androidbackend.model.dto.user.UpdateUsernameDto;
+import com.thss.androidbackend.model.vo.NotificationListVo;
 import com.thss.androidbackend.model.vo.NotificationVo;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.user.UserMeta;
@@ -42,7 +43,7 @@ public class UserController {
     private final ImageService imageService;
     private final PostService postService;
     private final SecurityService securityService;
-
+    private final NotificationRepository notificationRepository;
     @GetMapping("/user")
     ResponseEntity getUser() {
         System.out.println("get current user");
@@ -135,6 +136,25 @@ public class UserController {
     ResponseEntity getNotificationList() {
         User user = securityService.getCurrentUser();
         List<NotificationVo> notificationMessageList = userService.getNotificationList(user.getId()).stream().map(NotificationMessage::getNotificationVo).toList();
-        return ResponseEntity.ok().body(notificationMessageList);
+        return ResponseEntity.ok().body(new NotificationListVo(notificationMessageList));
+    }
+
+    @PostMapping("/users/notification/clear")
+    ResponseEntity clearUserNotification() {
+        User user = securityService.getCurrentUser();
+        List<NotificationMessage> notificationMessageList = userService.getNotificationList(user.getId());
+        for (NotificationMessage notificationMessage: notificationMessageList) {
+            notificationMessage.setReadFlag(true);
+            notificationRepository.save(notificationMessage);
+        }
+        return ResponseEntity.ok().body("clear all notification success");
+    }
+
+    @PostMapping("/users/notification/clear/{id}")
+    ResponseEntity clearUserNotification(@PathVariable String id) {
+        NotificationMessage notificationMessage = notificationRepository.findById(id).get();
+        notificationMessage.setReadFlag(true);
+        notificationRepository.save(notificationMessage);
+        return ResponseEntity.ok().body("clear notification success");
     }
 }

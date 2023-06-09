@@ -180,6 +180,6 @@ public class UserServiceImpl implements UserService {
     }
 
     public List<NotificationMessage> getNotificationList(String userId) {
-        return notificationRepository.findAll().stream().filter(it -> it.getUserToNotifiy().equals(userId)).toList();
+        return notificationRepository.findAll().stream().filter(it -> it.getUserToNotify().getId().equals(userId)).toList();
     }
 }

@@ -13,11 +13,13 @@ public class NotificationServiceImpl implements NotificationService {
     private final NotificationRepository notificationRepository;
     private void createNotification(User targetUser, User sourceUser, String title, String content, String route) {
         NotificationMessage notificationMessage = new NotificationMessage();
-        notificationMessage.setUserToNotifiy(targetUser);
+        notificationMessage.setUserToNotify(targetUser);
         notificationMessage.setCreator(sourceUser);
         notificationMessage.setTitle(title);
         notificationMessage.setContent(content);
         notificationMessage.setRoute(route);
+        notificationMessage.setReadFlag(false);
+        System.out.println(notificationMessage);
         notificationRepository.save(notificationMessage);
     }
 

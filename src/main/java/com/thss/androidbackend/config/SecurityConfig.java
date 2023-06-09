@@ -55,7 +55,7 @@ public class SecurityConfig{
 //                .logout().logoutUrl("/login/logout").and()
                 .authorizeHttpRequests()
                 .requestMatchers(HttpMethod.POST,"/login/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/users/notifications").authenticated()
+                .requestMatchers(HttpMethod.GET, "/users/notifications/**").authenticated()
                 .requestMatchers(HttpMethod.POST,"/register/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/users/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()

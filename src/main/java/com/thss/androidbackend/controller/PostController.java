@@ -78,7 +78,7 @@ public class PostController {
             }
             User self = securityService.getCurrentUser();
             List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
-                    .filter(post -> post.getCreator().equals(self))
+//                    .filter(post -> post.getCreator().equals(self))
                     .map(postService::getPostCover)
                     .toList();
             PostCoverList postPage = new PostCoverList(postCovers);

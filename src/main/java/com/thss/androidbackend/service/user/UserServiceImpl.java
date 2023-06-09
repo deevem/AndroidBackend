@@ -117,7 +117,7 @@ public class UserServiceImpl implements UserService {
         if(!passwordEncoder.matches(dto.oldPassword(), user.getPassword())){
             throw new BadCredentialsException("Wrong password");
         }
-        user.setPassword(passwordEncoder.encode(dto.oldPassword()));
+        user.setPassword(passwordEncoder.encode(dto.newPassword()));
         userRepo.save(user);
     }
     public UserMeta getUserMeta(String userId){

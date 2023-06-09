@@ -54,10 +54,7 @@ public class UserController {
     @GetMapping("/user/{id}")
     ResponseEntity getUserById(@PathVariable String id) {
         User user = userRepository.findById(id).get();
-        if (user != null) {
-            return ResponseEntity.ok().body(user);
-        }
-        return ResponseEntity.badRequest().body("find user by id failed");
+        return ResponseEntity.ok().body(userService.getUserVoByUser(user));
     }
 
     @PostMapping("/users/{id}/subscribe")

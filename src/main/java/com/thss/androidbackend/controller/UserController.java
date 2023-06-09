@@ -17,9 +17,6 @@ import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.RepositoryRestController;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -46,7 +43,7 @@ public class UserController {
     ResponseEntity getUser() {
         System.out.println("get current user");
         User currentUser = securityService.getCurrentUser();
-        return ResponseEntity.ok().body(userService.getUserMeta(currentUser));
+        return ResponseEntity.ok().body(userService.getUserVoByUser(currentUser));
     }
 
     @GetMapping("/user/{id}")

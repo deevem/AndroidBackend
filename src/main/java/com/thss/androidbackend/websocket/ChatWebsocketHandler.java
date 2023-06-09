@@ -113,6 +113,10 @@ public class ChatWebsocketHandler extends TextWebSocketHandler {
         }
     }
 
+    public void sendMessage() {
+
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) {
         sessions.remove(session);

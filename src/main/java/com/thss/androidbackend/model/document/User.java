@@ -3,6 +3,7 @@ package com.thss.androidbackend.model.document;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.user.UserMeta;
+import com.thss.androidbackend.model.vo.user.UserVo;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import lombok.Getter;
@@ -65,4 +66,5 @@ public class User {
         }
         return false;
     }
+
 }

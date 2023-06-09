@@ -12,6 +12,7 @@ import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.security.SecurityService;
+import com.thss.androidbackend.websocket.ChatWebsocketHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class PostServiceImpl implements PostService {
     private final PostRepository postRepository;
     private final SecurityService securityService;
     private final UserRepository userRepository;
+    private final ChatWebsocketHandler chatWebsocketHandler;
 
     public void create(PostCreateDto dto){
         Post newPost = new Post();
@@ -208,6 +210,9 @@ public class PostServiceImpl implements PostService {
 
             return detail;
     }
+
+
+
     public void addReply(String postId, Reply reply){
         Optional<Post> post = postRepository.findById(postId);
         if(post.isEmpty()) {
@@ -216,6 +221,7 @@ public class PostServiceImpl implements PostService {
         Post realPost = post.get();
         realPost.getComments().add(reply);
         postRepository.save(realPost);
+        chatWebsocketHandler.sendMessage();
     }
 
     @Override

@@ -13,6 +13,8 @@ import com.thss.androidbackend.repository.ReplyRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.security.SecurityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -37,7 +39,7 @@ public class PostServiceImpl implements PostService {
         newPost.setTitle(dto.title());
         newPost.setLocation(dto.location());
         postRepository.save(newPost);
-        user.getPostList().add(getPostCover(newPost));
+        user.getPostList().add(newPost);
         userRepository.save(user);
     }
 
@@ -64,13 +66,50 @@ public class PostServiceImpl implements PostService {
         }
         User user = securityService.getCurrentUser();
         Post realPost = post.get();
-        LazyLoadingProxy lazyUser = (LazyLoadingProxy) post.get().getLikes();
-        Set<User> likes = (Set<User>) lazyUser.getTarget();
-        System.out.println(likes);
+        List<User> likes = realPost.getLikes();
         if(likes.stream().anyMatch(u -> u.getId().equals(user.getId()))){
             throw new CustomException(HttpStatus.BAD_REQUEST, "Already liked");
         } else {
             likes.add(user);
+        }
+        postRepository.save(realPost);
+    }
+
+    public void unLike(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(!realPost.getLikes().remove(user)){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Not liked yet");
+        }
+        postRepository.save(realPost);
+    }
+    public void collect(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(realPost.getCollects().stream().anyMatch(u -> u.equals(user))){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "Already collected");
+        } else {
+            realPost.getCollects().add(user);
+        }
+        postRepository.save(realPost);
+    }
+    public void unCollect(String postId){
+        Optional<Post> post = postRepository.findById(postId);
+        if(post.isEmpty()) {
+            throw new CustomException(HttpStatus.NOT_FOUND, "Post not found");
+        }
+        User user = securityService.getCurrentUser();
+        Post realPost = post.get();
+        if(!realPost.getCollects().remove(user)){
+            throw new CustomException(HttpStatus.BAD_REQUEST, "not collected");
         }
         postRepository.save(realPost);
     }
@@ -190,34 +229,9 @@ public class PostServiceImpl implements PostService {
         postRepository.save(realPost);
     }
 
-    public List<PostCover> getAllPost() {
-        List<Post> allPost = postRepository.findAll();
-        List<PostCover> allPostCover = allPost.stream().map(realPost -> {
-            User creator = realPost.getCreator();
-            boolean liked = realPost.getLikes().stream().anyMatch(
-                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
-            boolean collected = realPost.getCollects().stream().anyMatch(
-                    u -> u.getId().equals(securityService.getCurrentUser().getId()));
-            return new PostCover(
-                    realPost.getId(),
-                    new UserMeta(
-                            creator.getId(),
-                            creator.getUsername(),
-                            creator.getAvatarUrl()
-                    ),
-                    realPost.getCreateTime(),
-                    realPost.getTitle(),
-                    realPost.getContent(),
-                    realPost.getImages(),
-                    realPost.getTag(),
-                    realPost.getLikes().size(),
-                    realPost.getCollects().size(),
-                    realPost.getComments(),
-                    liked,
-                    collected,
-                    realPost.getLocation()
-            );
-        }).collect(Collectors.toList());
-        return allPostCover;
+    @Override
+    public List<Post> generalSearch(String keyword) {
+        List<Post> posts = postRepository.findByTitleContainingIgnoreCaseAndContentContainingIgnoreCaseAndTagContainsIgnoreCase(keyword, keyword, keyword);
+        return posts;
     }
 }

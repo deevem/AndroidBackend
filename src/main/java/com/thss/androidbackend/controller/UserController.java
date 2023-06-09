@@ -29,6 +29,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Controller
 @RepositoryRestController
@@ -45,7 +46,7 @@ public class UserController {
     ResponseEntity getUser() {
         System.out.println("get current user");
         User currentUser = securityService.getCurrentUser();
-        return ResponseEntity.ok().body(currentUser);
+        return ResponseEntity.ok().body(userService.getUserMeta(currentUser));
     }
 
     @GetMapping("/user/{id}")
@@ -103,10 +104,10 @@ public class UserController {
 
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) return ResponseEntity.badRequest().body("user not found");
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-        List<PostCover> postList = user.get().getPostList().subList(page * size, Math.min((page + 1) * size, userRepository.findById(id).get().getPostList().size()));
-        Page<PostCover> postListPage = new PageImpl<>(postList, pageable, postList.size());
-        return ResponseEntity.ok().body(postListPage);
+        List<PostCover> postList = user.get().getPostList().stream().map(postService::getPostCover)
+                .collect(Collectors.toList())
+                .subList(page * size, Math.min((page + 1) * size, userRepository.findById(id).get().getPostList().size()));
+        return ResponseEntity.ok().body(postList);
     }
     @GetMapping("/users/{id}/subscriberList")
     ResponseEntity<?> getSubscriberList(@PathVariable String id,
@@ -114,11 +115,9 @@ public class UserController {
                                         @RequestParam(value = "size", defaultValue = "10") int size){
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) return ResponseEntity.badRequest().body("user not found");
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-        List<UserMeta> subscribeList = user.get().getSubscriberList()
+        List<UserMeta> subscribeList = user.get().getSubscriberList().stream().map(User::getMeta).collect(Collectors.toList())
                 .subList(page * size, Math.min((page + 1) * size, user.get().getSubscriberList().size()));
-        Page<UserMeta> subscribeListPage = new PageImpl<>(subscribeList, pageable, subscribeList.size());
-        return ResponseEntity.ok().body(subscribeListPage);
+        return ResponseEntity.ok().body(subscribeList);
     }
     @GetMapping("/users/{id}/followerList")
     ResponseEntity<?> getFollowerList(@PathVariable String id,
@@ -126,10 +125,8 @@ public class UserController {
                                         @RequestParam(value = "size", defaultValue = "10") int size){
         Optional<User> user = userRepository.findById(id);
         if(user.isEmpty()) return ResponseEntity.badRequest().body("user not found");
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-        List<UserMeta> subscribeList = user.get().getFollowList()
+        List<UserMeta> subscribeList = user.get().getFollowList().stream().map(User::getMeta).collect(Collectors.toList())
                 .subList(page * size, Math.min((page + 1) * size, user.get().getFollowList().size()));
-        Page<UserMeta> subscribeListPage = new PageImpl<>(subscribeList, pageable, subscribeList.size());
-        return ResponseEntity.ok().body(subscribeListPage);
+        return ResponseEntity.ok().body(subscribeList);
     }
 }

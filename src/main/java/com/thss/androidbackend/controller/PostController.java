@@ -3,6 +3,7 @@ package com.thss.androidbackend.controller;
 import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
+import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.PostCreateDto;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
@@ -68,10 +69,12 @@ public class PostController {
             } else {
                 dir = Sort.Direction.DESC;
             }
-            PostCoverList postPage = new PostCoverList(
-                    postRepository.findAll(Sort.by(dir, sort)).stream().map(post -> postService.getPostCover(post.getId()))
-                            .collect(Collectors.toList())
-            );
+            User self = securityService.getCurrentUser();
+            List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
+                    .filter(post -> post.getCreator().equals(self))
+                    .map(postService::getPostCover)
+                    .toList();
+            PostCoverList postPage = new PostCoverList(postCovers);
             return ResponseEntity.ok(postPage);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());

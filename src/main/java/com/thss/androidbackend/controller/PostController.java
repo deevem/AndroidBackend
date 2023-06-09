@@ -1,5 +1,6 @@
 package com.thss.androidbackend.controller;
 
+import com.thss.androidbackend.Global;
 import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
@@ -91,7 +92,7 @@ public class PostController {
             List<MultipartFile> multipartFiles = multipartHttpServletRequest.getFiles("image");
             List<String> images = multipartFiles.stream().map(file -> {
                 String name = imageService.uploadImage(file);
-                return "http://183.172.178.133:8080/image/" + name;
+                return Global.HOST + "/image/" + name;
             }).collect(Collectors.toList());
             List<String> tags = Arrays.stream(multipartHttpServletRequest.getParameter("tag").split(",")).toList();
             postService.create(multipartHttpServletRequest.getParameter("title"), multipartHttpServletRequest.getParameter("content"), images,

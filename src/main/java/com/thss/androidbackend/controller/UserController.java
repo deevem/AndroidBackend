@@ -1,6 +1,7 @@
 package com.thss.androidbackend.controller;
 
 
+import com.thss.androidbackend.Global;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.user.UpdateDescriptionDto;
 import com.thss.androidbackend.model.dto.user.UpdateNicknameDto;
@@ -86,7 +87,7 @@ public class UserController {
         MultipartFile avatar = multipartHttpServletRequest.getFile("image");
         String name = imageService.uploadImage(avatar);
         if(name == null) return ResponseEntity.badRequest().body("upload avatar failed");
-        userService.updateAvatar("http://183.172.178.133:8080/image/" + name);
+        userService.updateAvatar(Global.HOST + "/image/" + name);
         return ResponseEntity.ok().body("update avatar success");
     }
     @PostMapping("/users/update/password")

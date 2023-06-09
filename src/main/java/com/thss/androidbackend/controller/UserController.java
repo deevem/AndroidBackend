@@ -86,7 +86,7 @@ public class UserController {
         MultipartFile avatar = multipartHttpServletRequest.getFile("image");
         String name = imageService.uploadImage(avatar);
         if(name == null) return ResponseEntity.badRequest().body("upload avatar failed");
-        userService.updateAvatar("http://183.172.141.89:8080/image/" + name);
+        userService.updateAvatar("http://183.172.178.133:8080/image/" + name);
         return ResponseEntity.ok().body("update avatar success");
     }
     @PostMapping("/users/update/password")

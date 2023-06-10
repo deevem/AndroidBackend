@@ -23,4 +23,7 @@ public interface UserRepository extends MongoRepository<User, String> {
     @Query
     List<User> findByUsernameContainingIgnoreCase(String keyword);
 
+    @Query
+    List<User> findByUsernameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(String k1, String k2);
+
 }

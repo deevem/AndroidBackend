@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
+import java.util.List;
+
 @RepositoryRestResource
 public interface UserRepository extends MongoRepository<User, String> {
     @Query
@@ -15,5 +17,8 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     @Query(value = "{ 'phone' : :#{#phone} }")
     User findByPhone(String phone);
+
+    @Query
+    List<User> findAllByUsernameContaining(String keyword);
 
 }

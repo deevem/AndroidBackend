@@ -61,6 +61,10 @@ public class User {
         );
     }
 
+    public String getUserId() {
+        return id;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if(obj instanceof User) {

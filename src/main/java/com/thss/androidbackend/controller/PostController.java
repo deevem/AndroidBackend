@@ -13,7 +13,7 @@ import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.forum.PostService;
 import com.thss.androidbackend.service.forum.ReplyService;
-import com.thss.androidbackend.service.image.ImageService;
+import com.thss.androidbackend.service.file.FileService;
 import com.thss.androidbackend.service.security.SecurityService;
 import jakarta.annotation.Resource;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,12 +28,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import java.io.InputStream;
 import java.net.URI;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -42,14 +37,13 @@ import java.util.*;
 @RepositoryRestController
 @RequiredArgsConstructor
 public class PostController {
-    private static String UPLOAD_PATH = "File/image";
     @Resource
     private final PostRepository postRepository;
     private final PostService postService;
     private final ReplyService replyService;
     private final UserRepository userRepository;
     private final SecurityService securityService;
-    private final ImageService imageService;
+    private final FileService fileService;
 
 
     @GetMapping(value = "/posts/{id}/cover")
@@ -122,8 +116,8 @@ public class PostController {
             MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
             List<MultipartFile> multipartFiles = multipartHttpServletRequest.getFiles("image");
             List<String> images = multipartFiles.stream().map(file -> {
-                String name = imageService.uploadImage(file);
-                return Global.HOST + "/image/" + name;
+                String name = fileService.uploadImage(file);
+                return Global.HOST + "/file/" + name;
             }).collect(Collectors.toList());
             List<String> tags = Arrays.stream(multipartHttpServletRequest.getParameter("tag").split(",")).toList();
             postService.create(multipartHttpServletRequest.getParameter("title"), multipartHttpServletRequest.getParameter("content"), images,
@@ -132,42 +126,6 @@ public class PostController {
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
-    }
-
-    //TODO: to be fixed
-    @RequestMapping(method = RequestMethod.POST, value = "/posts/{id}/uploadImage")
-    public @ResponseBody ResponseEntity<?> addImage(@NotNull HttpServletRequest httpServletRequest, @PathVariable String id){
-        MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
-        Iterator<String> fileNames = multipartHttpServletRequest.getFileNames();
-        List<MultipartFile> files = multipartHttpServletRequest.getFiles(fileNames.next());
-
-
-        for (MultipartFile image : files) {
-            try {
-                String name = image.getOriginalFilename();
-                System.out.println(name);
-
-                InputStream inputStream = image.getInputStream();
-                Path directory = Paths.get(UPLOAD_PATH);
-                if (!Files.exists(directory)) {
-                    Files.createDirectories(directory);
-                }
-                long copy = Files.copy(inputStream, directory.resolve(name));
-                Optional<Post> post = postRepository.findById(id);
-                if (post.isEmpty()){
-                    return ResponseEntity.badRequest().body("post not found");
-                } else {
-                    post.get().getImages().add(name);
-                    postRepository.save(post.get());
-                    return ResponseEntity.ok("upload success");
-                }
-
-            } catch (Exception e) {
-                e.printStackTrace();
-                return ResponseEntity.badRequest().body("upload failed");
-            }
-        }
-        return ResponseEntity.badRequest().body("upload failed");
     }
     @PostMapping(value = "/posts/{id}/like")
     public @ResponseBody ResponseEntity like(@NotNull @PathVariable String id) {

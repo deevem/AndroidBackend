@@ -14,7 +14,7 @@ import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.NotificationRepository;
 import com.thss.androidbackend.repository.UserRepository;
-import com.thss.androidbackend.service.image.ImageService;
+import com.thss.androidbackend.service.file.FileService;
 import com.thss.androidbackend.service.forum.PostService;
 import com.thss.androidbackend.service.security.SecurityService;
 import com.thss.androidbackend.service.user.UserService;
@@ -40,7 +40,7 @@ public class UserController {
     @Resource
     private final UserRepository userRepository;
     private final UserService userService;
-    private final ImageService imageService;
+    private final FileService fileService;
     private final PostService postService;
     private final SecurityService securityService;
     private final NotificationRepository notificationRepository;
@@ -98,9 +98,9 @@ public class UserController {
     ResponseEntity<?> updateAvatar(@NotNull HttpServletRequest httpServletRequest){
         MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) httpServletRequest;
         MultipartFile avatar = multipartHttpServletRequest.getFile("image");
-        String name = imageService.uploadImage(avatar);
+        String name = fileService.uploadImage(avatar);
         if(name == null) return ResponseEntity.badRequest().body("upload avatar failed");
-        userService.updateAvatar(Global.HOST + "/image/" + name);
+        userService.updateAvatar(Global.HOST + "/file/" + name);
         return ResponseEntity.ok().body("update avatar success");
     }
     @PostMapping("/users/update/password")

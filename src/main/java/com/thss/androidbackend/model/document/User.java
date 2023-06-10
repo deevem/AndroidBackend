@@ -15,10 +15,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Document("users")
 @Getter
@@ -75,7 +72,7 @@ public class User {
 
     @Override
     public int hashCode() {
-        return id.hashCode();
+        return Objects.hash(getId());
     }
 
 }

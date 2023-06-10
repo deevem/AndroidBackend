@@ -2,6 +2,7 @@ package com.thss.androidbackend.controller;
 
 
 import com.thss.androidbackend.Global;
+import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.NotificationMessage;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
@@ -13,7 +14,9 @@ import com.thss.androidbackend.model.vo.NotificationListVo;
 import com.thss.androidbackend.model.vo.NotificationVo;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostCoverList;
+import com.thss.androidbackend.model.vo.user.UserList;
 import com.thss.androidbackend.model.vo.user.UserMeta;
+import com.thss.androidbackend.model.vo.user.UserVo;
 import com.thss.androidbackend.repository.NotificationRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.file.FileService;
@@ -172,12 +175,16 @@ public class UserController {
     }
 
     @GetMapping("/users/search")
-    ResponseEntity search(@RequestParam String keyword){
+    ResponseEntity search(@RequestParam(value = "keyword", defaultValue = "") String keyword){
+        try {
         String[] keywords = keyword.split(" ");
+        for (String key: keywords) {
+            System.out.println(key);
+        }
         Set<User> result = new HashSet<>();
         boolean first = true;
         for(String key : keywords) {
-            Set<User> users = userRepository.findByUsernameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(key, key)
+            Set<User> users = userRepository.findByUsernameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(key, key)
                     .stream().collect(Collectors.toSet());
             if (first) {
                 first = false;
@@ -185,7 +192,13 @@ public class UserController {
             } else {
                 result.retainAll(users);
             }
+            System.out.println(result.size());
         }
-        return ResponseEntity.ok(result.stream().collect(Collectors.toList()));
+        List<UserVo> userList = result.stream().map(u -> userService.getUserVoByUser(u)).collect(Collectors.toList());
+        return ResponseEntity.ok(new UserList(userList));
+        } catch (CustomException e) {
+            return new ResponseEntity(e.getMessage(), e.getStatus());
+        }
+
     }
 }

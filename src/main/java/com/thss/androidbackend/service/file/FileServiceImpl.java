@@ -1,6 +1,5 @@
-package com.thss.androidbackend.service.image;
+package com.thss.androidbackend.service.file;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,8 +10,8 @@ import java.nio.file.Paths;
 import java.util.Random;
 
 @Service
-public class ImageServiceImpl implements ImageService {
-    private static String UPLOAD_PATH = "File/image";
+public class FileServiceImpl implements FileService {
+    private static String UPLOAD_PATH = "File";
 
     public String uploadImage(MultipartFile image){
         try{

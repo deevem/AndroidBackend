@@ -1,8 +1,8 @@
-package com.thss.androidbackend.service.image;
+package com.thss.androidbackend.service.file;
 
 import org.springframework.web.multipart.MultipartFile;
 
-public interface ImageService {
+public interface FileService {
     String uploadImage(MultipartFile image);
     String getImage(String imageId);
 }

@@ -19,6 +19,6 @@ public interface UserRepository extends MongoRepository<User, String> {
     User findByPhone(String phone);
 
     @Query
-    List<User> findAllByUsernameContaining(String keyword);
+    List<User> findByUsernameContainingIgnoreCase(String keyword);
 
 }

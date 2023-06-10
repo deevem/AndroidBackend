@@ -6,6 +6,7 @@ import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostDetail;
 
 import java.util.List;
+import java.util.Set;
 
 public interface PostService {
     void create(String title, String content, List<String> images, List<String> tag, String location);
@@ -19,5 +20,5 @@ public interface PostService {
     void unCollect(String postId);
     void addReply(String postId, Reply reply);
     void deleteReply(String postId, String replyId);
-    List<Post> search(String keyword);
+    Set<Post> search(String keyword);
 }

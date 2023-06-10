@@ -21,6 +21,7 @@ import org.springframework.data.mongodb.core.convert.LazyLoadingProxy;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -246,8 +247,13 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> search(String keyword) {
+    public Set<Post> search(String keyword) {
         List<Post> posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrTagContainsIgnoreCase(keyword, keyword, keyword);
-        return posts;
+        Set<Post> postSet = new HashSet<>(posts);
+        List<User> users = userRepository.findByUsernameContainingIgnoreCase(keyword);
+        for(User user: users){
+            postSet.addAll(user.getPostList());
+        }
+        return postSet;
     }
 }

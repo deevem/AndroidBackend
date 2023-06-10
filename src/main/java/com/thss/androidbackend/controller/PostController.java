@@ -202,7 +202,7 @@ public class PostController {
             Set<Post> result = new HashSet<>();
             boolean first = true;
             for(String key : keywords) {
-                Set<Post> posts = postService.search(key).stream().collect(Collectors.toSet());
+                Set<Post> posts = postService.search(key);
                 if (first) {
                     first = false;
                     result = posts;

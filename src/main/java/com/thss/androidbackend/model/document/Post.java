@@ -18,6 +18,7 @@ public class Post {
     @Id private String id;
     @DBRef(lazy = true)
     private User creator;
+    private String creatorName;
     private Long createTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private Long lastUpdateTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private String title;

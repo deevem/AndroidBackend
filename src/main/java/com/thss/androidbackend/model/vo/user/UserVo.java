@@ -20,7 +20,8 @@ public record UserVo(
         List<PostCover> postList,
         List<String> interestedTags,
         List<String> roles,
-        List<PostCover> collection
+        List<PostCover> collection,
+        List<UserMeta> blackList
 
 ) implements Serializable {
 

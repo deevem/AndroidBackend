@@ -67,6 +67,18 @@ public class UserController {
         userService.unsubscribe(id);
         return ResponseEntity.ok().body("unsubscribe success");
     }
+
+    @PostMapping("users/{id}/black")
+    ResponseEntity<?> black(@PathVariable String id) {
+        userService.black(id);
+        return ResponseEntity.ok().body("black success");
+    }
+    @PostMapping("users/{id}/unblack")
+    ResponseEntity<?> unblack(@PathVariable String id) {
+        userService.unblack(id);
+        return ResponseEntity.ok().body("unblack success");
+    }
+
     @PostMapping("/users/update/description")
     ResponseEntity<?> updateDescription(@RequestBody @NotNull UpdateDescriptionDto dto){
         userService.updateDescription(dto.description());

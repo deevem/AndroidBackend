@@ -246,7 +246,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public List<Post> generalSearch(String keyword) {
+    public List<Post> search(String keyword) {
         List<Post> posts = postRepository.findByTitleContainingIgnoreCaseOrContentContainingIgnoreCaseOrTagContainsIgnoreCase(keyword, keyword, keyword);
         return posts;
     }

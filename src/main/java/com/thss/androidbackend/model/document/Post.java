@@ -32,4 +32,11 @@ public class Post {
     private List<String> tag = new ArrayList<>();
     private int shares = 0;
     private String location = "";
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Post)) return false;
+        Post post = (Post) o;
+        return Objects.equals(getId(), post.getId());
+    }
 }

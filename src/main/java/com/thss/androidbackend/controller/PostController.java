@@ -5,8 +5,6 @@ import com.thss.androidbackend.exception.CustomException;
 import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.document.User;
-import com.thss.androidbackend.model.dto.post.PostCreateDto;
-import com.thss.androidbackend.model.vo.TokenVo;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostCoverList;
@@ -34,13 +32,11 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @RepositoryRestController
 @RequiredArgsConstructor
@@ -67,9 +63,11 @@ public class PostController {
 
     @GetMapping(value = "/posts")
     public @ResponseBody ResponseEntity<?> getAllPost(@RequestParam(value = "sort", defaultValue = "createTime") String sort,
-                                                      @RequestParam(value = "direction", defaultValue = "DESC") String direction
+                                                      @RequestParam(value = "direction", defaultValue = "DESC") String direction,
+                                                      @RequestParam(value = "filter", defaultValue = "all") String filter
     ) {
         try {
+            System.out.println("sort: " + sort + " direction: " + direction + " filter: " + filter);
             Sort.Direction dir;
             if (direction.equals("ASC")) {
                 dir = Sort.Direction.ASC;
@@ -78,20 +76,41 @@ public class PostController {
             }
             if (securityService.isAnonymous()) {
                 List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
-//                    .filter(post -> post.getCreator().equals(self))
                         .map(postService::getPostCover)
                         .toList();
-                System.out.println(postCovers);
                 PostCoverList postPage = new PostCoverList(postCovers);
                 return ResponseEntity.ok(postPage);
             } else {
                 User self = securityService.getCurrentUser();
                 List<String> blackList = self.getBlackList().stream().map(u -> u.getId()).toList();
-                List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
-                    .filter(post -> !blackList.contains(post.getCreator().getId()))
-                        .map(postService::getPostCover)
-                        .toList();
-                System.out.println(postCovers);
+                List<PostCover> postCovers;
+                if (sort.equalsIgnoreCase("hot")){
+                    if("ASC".equals(direction)){
+                        postCovers = postRepository.findAll(Sort.by(dir, "createTime")).stream()
+                                .filter(post -> !blackList.contains(post.getCreator().getId()))
+                                .sorted(Comparator.comparingInt(o -> o.getComments().size()))
+                                .map(postService::getPostCover)
+                                .toList();
+                    } else {
+                        postCovers = postRepository.findAll(Sort.by(dir, "createTime")).stream()
+                                .filter(post -> !blackList.contains(post.getCreator().getId()))
+                                .sorted((o1, o2) -> o2.getComments().size() - o1.getComments().size())
+                                .map(postService::getPostCover)
+                                .toList();
+                    }
+                } else {
+                    postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
+                            .filter(post -> !blackList.contains(post.getCreator().getId()))
+                            .map(postService::getPostCover)
+                            .toList();
+                }
+                if(filter.equalsIgnoreCase("subscribed")) {
+                    List<User> subscribers = self.getFollowList();
+                    postCovers = postCovers.stream()
+                            .filter(post -> subscribers.contains(post.creator()))
+                            .toList();
+                    System.out.println("filtered subscribed");
+                }
                 PostCoverList postPage = new PostCoverList(postCovers);
                 return ResponseEntity.ok(postPage);
             }
@@ -225,7 +244,19 @@ public class PostController {
     @GetMapping(value = "/posts/search")
     public @ResponseBody ResponseEntity search(@RequestParam(value = "keyword", defaultValue = "") String keyword) {
         try {
-            List<PostCover> postPage = postService.generalSearch(keyword).stream().map(postService::getPostCover)
+            String[] keywords = keyword.split(" ");
+            Set<Post> result = new HashSet<>();
+            boolean first = true;
+            for(String key : keywords) {
+                Set<Post> posts = postService.search(key).stream().collect(Collectors.toSet());
+                if (first) {
+                    first = false;
+                    result = posts;
+                } else {
+                    result.retainAll(posts);
+                }
+            }
+            List<PostCover> postPage = result.stream().map(postService::getPostCover)
                     .collect(Collectors.toList());
             return ResponseEntity.ok(new PostCoverList(postPage));
         } catch (CustomException e) {

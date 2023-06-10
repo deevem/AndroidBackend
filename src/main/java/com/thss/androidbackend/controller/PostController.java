@@ -70,7 +70,7 @@ public class PostController {
                 dir = Sort.Direction.DESC;
             }
             List<PostCover> postCovers;
-            if (sort.equalsIgnoreCase("hot")){
+            if (sort.equalsIgnoreCase("comments")){
                 if("ASC".equals(direction)){
                     postCovers = postRepository.findAll().stream()
                             .sorted(Comparator.comparingInt(o -> o.getComments().size()))
@@ -82,7 +82,20 @@ public class PostController {
                             .map(postService::getPostCover)
                             .toList();
                 }
-            } else {
+            } else if (sort.equalsIgnoreCase("likes")){
+                if("ASC".equals(direction)){
+                    postCovers = postRepository.findAll().stream()
+                            .sorted(Comparator.comparingInt(o -> o.getLikes().size()))
+                            .map(postService::getPostCover)
+                            .toList();
+                } else {
+                    postCovers = postRepository.findAll().stream()
+                            .sorted((o1, o2) -> o2.getLikes().size() - o1.getLikes().size())
+                            .map(postService::getPostCover)
+                            .toList();
+                }
+            }
+            else {
                 postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
                         .map(postService::getPostCover)
                         .toList();

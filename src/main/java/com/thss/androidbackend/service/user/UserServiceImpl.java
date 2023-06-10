@@ -1,6 +1,7 @@
 package com.thss.androidbackend.service.user;
 
 import com.thss.androidbackend.model.document.NotificationMessage;
+import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.Reply;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.register.EmailRegisterDto;
@@ -22,7 +23,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service

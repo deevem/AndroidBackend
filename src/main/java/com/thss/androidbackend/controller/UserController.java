@@ -3,6 +3,7 @@ package com.thss.androidbackend.controller;
 
 import com.thss.androidbackend.Global;
 import com.thss.androidbackend.model.document.NotificationMessage;
+import com.thss.androidbackend.model.document.Post;
 import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.user.UpdateDescriptionDto;
 import com.thss.androidbackend.model.dto.user.UpdateNicknameDto;
@@ -11,6 +12,7 @@ import com.thss.androidbackend.model.dto.user.UpdateUsernameDto;
 import com.thss.androidbackend.model.vo.NotificationListVo;
 import com.thss.androidbackend.model.vo.NotificationVo;
 import com.thss.androidbackend.model.vo.forum.PostCover;
+import com.thss.androidbackend.model.vo.forum.PostCoverList;
 import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.NotificationRepository;
 import com.thss.androidbackend.repository.UserRepository;
@@ -29,8 +31,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -165,5 +169,23 @@ public class UserController {
         notificationMessage.setReadFlag(true);
         notificationRepository.save(notificationMessage);
         return ResponseEntity.ok().body("clear notification success");
+    }
+
+    @GetMapping("/users/search")
+    ResponseEntity search(@RequestParam String keyword){
+        String[] keywords = keyword.split(" ");
+        Set<User> result = new HashSet<>();
+        boolean first = true;
+        for(String key : keywords) {
+            Set<User> users = userRepository.findByUsernameContainingIgnoreCaseAndDescriptionContainingIgnoreCase(key, key)
+                    .stream().collect(Collectors.toSet());
+            if (first) {
+                first = false;
+                result = users;
+            } else {
+                result.retainAll(users);
+            }
+        }
+        return ResponseEntity.ok(result.stream().collect(Collectors.toList()));
     }
 }

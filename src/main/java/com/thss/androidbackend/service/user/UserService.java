@@ -19,6 +19,8 @@ public interface UserService {
     User create(@NotNull PhoneRegisterDto dto);
     void subscribe(@NotNull String userId);
     void unsubscribe(@NotNull String userId);
+    void black(@NotNull String userId);
+    void unblack(@NotNull String userId);
     void updateDescription(@NotNull String description);
     void updateAvatar(@NotNull String avatar);
     void ban(@NotNull String userId);

@@ -23,6 +23,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -80,19 +81,47 @@ public class UserServiceImpl implements UserService {
     public void subscribe(@NotNull String userId){
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         User self = securityService.getCurrentUser();
-        user.getSubscriberList().add(self);
-        self.getFollowList().add(user);
-        userRepo.save(self);
-        userRepo.save(user);
+        if (user.equals(self)) {
+            if (self.getFollowList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getFollowList().add(user);
+            }
+            if (self.getSubscriberList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getSubscriberList().add(user);
+            }
+            userRepo.save(self);
+        } else {
+            if (user.getSubscriberList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                user.getSubscriberList().add(self);
+            }
+            if (self.getFollowList().stream().filter(u -> u.equals(user)).collect(Collectors.toList()).isEmpty()) {
+                self.getFollowList().add(user);
+            }
+            userRepo.save(self);
+            userRepo.save(user);
+        }
     }
 
     public void unsubscribe(String userId){
         User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
         User self = securityService.getCurrentUser();
-        user.getSubscriberList().remove(self);
-        self.getFollowList().remove(user);
-        userRepo.save(self);
-        userRepo.save(user);
+        if (user.equals(self)) {
+            if (!self.getSubscriberList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getSubscriberList().remove(user);
+            }
+            if (!self.getFollowList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getFollowList().remove(user);
+            }
+            userRepo.save(self);
+        } else {
+            if (!user.getSubscriberList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                user.getSubscriberList().remove(self);
+            }
+            if (!self.getFollowList().stream().filter(u -> u.equals(user)).collect(Collectors.toList()).isEmpty()) {
+                self.getFollowList().remove(user);
+            }
+            userRepo.save(self);
+            userRepo.save(user);
+        }
     }
     public void updateDescription(String description){
         User user = securityService.getCurrentUser();

@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 public record UserMeta (
     String userId,
-    String userName,
+    String userName ,
     String userIconUrl
 
 ) implements Serializable {

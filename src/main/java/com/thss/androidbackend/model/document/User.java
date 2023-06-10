@@ -41,7 +41,7 @@ public class User {
     private Long lastLoginTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private Boolean banned = false;
     @DBRef(lazy = true)
-    private List<User> followList = new ArrayList<>();
+    private List<User> followList = new ArrayList<>(); // person who the user follows
     @DBRef(lazy = true)
     private List<User> subscriberList = new ArrayList<>();
     @DBRef(lazy = true)

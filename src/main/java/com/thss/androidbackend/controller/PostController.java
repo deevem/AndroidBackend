@@ -76,7 +76,8 @@ public class PostController {
             } else {
                 dir = Sort.Direction.DESC;
             }
-            User self = securityService.getCurrentUser();
+//            User self = securityService.getCurrentUser();
+
             List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
 //                    .filter(post -> post.getCreator().equals(self))
                     .map(postService::getPostCover)

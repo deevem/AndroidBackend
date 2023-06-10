@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
         user.getPostList().add(newPost);
         userRepository.save(user);
 
-        user.getFollowList().forEach(it -> notificationService.createNewPostNotification(it, user, newPost));
+        user.getSubscriberList().forEach(it -> notificationService.createNewPostNotification(it, user, newPost));
     }
 
     public PostCover getPostCover(String postId) {

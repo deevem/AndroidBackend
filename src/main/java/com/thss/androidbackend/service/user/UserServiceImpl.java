@@ -123,6 +123,38 @@ public class UserServiceImpl implements UserService {
             userRepo.save(user);
         }
     }
+
+    public void black(String userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User self = securityService.getCurrentUser();
+        if (user.equals(self)) {
+            if (self.getBlackList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getBlackList().add(user);
+            }
+            userRepo.save(self);
+        } else {
+            if (self.getBlackList().stream().filter(u -> u.equals(user)).collect(Collectors.toList()).isEmpty()) {
+                self.getBlackList().add(user);
+            }
+            userRepo.save(self);
+        }
+    }
+
+    public void unblack(String userId) {
+        User user = userRepo.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User not found"));
+        User self = securityService.getCurrentUser();
+        if (user.equals(self)) {
+            if (!self.getBlackList().stream().filter(u -> u.equals(self)).collect(Collectors.toList()).isEmpty()) {
+                self.getBlackList().remove(user);
+            }
+            userRepo.save(self);
+        } else {
+            if (!self.getBlackList().stream().filter(u -> u.equals(user)).collect(Collectors.toList()).isEmpty()) {
+                self.getBlackList().remove(user);
+            }
+            userRepo.save(self);
+        }
+    }
     public void updateDescription(String description){
         User user = securityService.getCurrentUser();
         user.setDescription(description);
@@ -206,7 +238,8 @@ public class UserServiceImpl implements UserService {
                 user.getPostList().stream().map(postService::getPostCover).toList(),
                 user.getInterestedTags(),
                 user.getRoles(),
-                user.getCollection().stream().map(postService::getPostCover).toList()
+                user.getCollection().stream().map(postService::getPostCover).toList(),
+                user.getBlackList().stream().map(User::getMeta).toList()
         );
     }
 

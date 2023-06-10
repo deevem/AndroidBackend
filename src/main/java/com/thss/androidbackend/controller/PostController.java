@@ -76,15 +76,26 @@ public class PostController {
             } else {
                 dir = Sort.Direction.DESC;
             }
-//            User self = securityService.getCurrentUser();
-
-            List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
+            if (securityService.isAnonymous()) {
+                List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
 //                    .filter(post -> post.getCreator().equals(self))
-                    .map(postService::getPostCover)
-                    .toList();
-            System.out.println(postCovers);
-            PostCoverList postPage = new PostCoverList(postCovers);
-            return ResponseEntity.ok(postPage);
+                        .map(postService::getPostCover)
+                        .toList();
+                System.out.println(postCovers);
+                PostCoverList postPage = new PostCoverList(postCovers);
+                return ResponseEntity.ok(postPage);
+            } else {
+                User self = securityService.getCurrentUser();
+                List<String> blackList = self.getBlackList().stream().map(u -> u.getId()).toList();
+                List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
+                    .filter(post -> !blackList.contains(post.getCreator().getId()))
+                        .map(postService::getPostCover)
+                        .toList();
+                System.out.println(postCovers);
+                PostCoverList postPage = new PostCoverList(postCovers);
+                return ResponseEntity.ok(postPage);
+            }
+
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }

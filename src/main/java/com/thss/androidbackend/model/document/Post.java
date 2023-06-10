@@ -23,6 +23,7 @@ public class Post {
     private Long lastUpdateTime = LocalDateTime.now().toInstant(ZoneOffset.of("+8")).toEpochMilli();
     private String title;
     private String content;
+    private String videoUrl;
     @DBRef(lazy = true)
     private List<Reply> comments = new ArrayList<>();
     private List<String> images = new ArrayList<>();

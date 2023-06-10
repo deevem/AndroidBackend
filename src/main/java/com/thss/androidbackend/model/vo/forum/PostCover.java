@@ -17,6 +17,7 @@ public record PostCover (
     Long createTime,
     String title,
     String content,
+    String videoUrl,
     List<String> images,
     List<String> tags,
     int likesNumber,

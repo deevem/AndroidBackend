@@ -121,7 +121,7 @@ public class PostController {
             }).collect(Collectors.toList());
             List<String> tags = Arrays.stream(multipartHttpServletRequest.getParameter("tag").split(",")).toList();
             postService.create(multipartHttpServletRequest.getParameter("title"), multipartHttpServletRequest.getParameter("content"), images,
-                    tags, multipartHttpServletRequest.getParameter("location"));
+                    tags, multipartHttpServletRequest.getParameter("location"), httpServletRequest.getParameter("video"));
             return new ResponseEntity<>(new HttpHeaders(), HttpStatus.OK);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());

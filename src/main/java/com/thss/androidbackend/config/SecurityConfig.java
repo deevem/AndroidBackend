@@ -59,7 +59,7 @@ public class SecurityConfig{
                 .requestMatchers(HttpMethod.POST,"/register/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/users/**").permitAll()
                 .requestMatchers(HttpMethod.GET,"/posts/**").permitAll()
-                .requestMatchers(HttpMethod.GET,"/image/**").permitAll()
+                .requestMatchers(HttpMethod.GET,"/file/**").permitAll()
                 .anyRequest().authenticated().and()
                 .addFilterBefore(jwtAuthorizationFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(filterChainExceptionHandler, LogoutFilter.class);

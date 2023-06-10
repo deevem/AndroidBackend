@@ -35,7 +35,7 @@ public class PostServiceImpl implements PostService {
     private final ChatWebsocketHandler chatWebsocketHandler;
     private final NotificationService notificationService;
 
-    public void create(String title, String content, List<String> images, List<String> tag, String location){
+    public void create(String title, String content, List<String> images, List<String> tag, String location, String videoUrl){
         Post newPost = new Post();
         User user = securityService.getCurrentUser();
         newPost.setCreator(user);
@@ -44,6 +44,8 @@ public class PostServiceImpl implements PostService {
         newPost.setImages(images);
         newPost.setTag(tag);
         newPost.setLocation(location);
+        newPost.setVideoUrl(videoUrl);
+        System.out.println(videoUrl);
         postRepository.save(newPost);
         user.getPostList().add(newPost);
         userRepository.save(user);
@@ -137,6 +139,7 @@ public class PostServiceImpl implements PostService {
                     post.getCreateTime(),
                     post.getTitle(),
                     post.getContent(),
+                    post.getVideoUrl(),
                     post.getImages(),
                     post.getTag(),
                     post.getLikes().size(),
@@ -161,6 +164,7 @@ public class PostServiceImpl implements PostService {
                     post.getCreateTime(),
                     post.getTitle(),
                     post.getContent(),
+                    post.getVideoUrl(),
                     post.getImages(),
                     post.getTag(),
                     post.getLikes().size(),

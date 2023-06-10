@@ -8,7 +8,7 @@ import com.thss.androidbackend.model.vo.forum.PostDetail;
 import java.util.List;
 
 public interface PostService {
-    void create(String title, String content, List<String> images, List<String> tag, String location);
+    void create(String title, String content, List<String> images, List<String> tag, String location, String videoUrl);
     PostCover getPostCover(String postId);
     PostCover getPostCover(Post post);
     PostDetail getPostDetail(String postId);

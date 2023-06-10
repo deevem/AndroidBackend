@@ -110,7 +110,11 @@ public class PostServiceImpl implements PostService {
         } else {
             realPost.getCollects().add(user);
         }
+        if (!user.getCollection().stream().anyMatch(p -> p.equals(realPost))) {
+            user.getCollection().add(realPost);
+        }
         postRepository.save(realPost);
+        userRepository.save(user);
     }
     public void unCollect(String postId){
         Optional<Post> post = postRepository.findById(postId);
@@ -122,7 +126,11 @@ public class PostServiceImpl implements PostService {
         if(!realPost.getCollects().remove(user)){
             throw new CustomException(HttpStatus.BAD_REQUEST, "not collected");
         }
+        if (user.getCollection().stream().anyMatch(p -> p.equals(realPost))) {
+            user.getCollection().remove(realPost);
+        }
         postRepository.save(realPost);
+        userRepository.save(user);
     }
     public PostCover getPostCover(Post post) {
         User creator = post.getCreator();

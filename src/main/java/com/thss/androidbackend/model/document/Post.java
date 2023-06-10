@@ -40,4 +40,9 @@ public class Post {
         Post post = (Post) o;
         return Objects.equals(getId(), post.getId());
     }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getId());
+    }
 }

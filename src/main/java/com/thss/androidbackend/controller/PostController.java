@@ -8,6 +8,7 @@ import com.thss.androidbackend.model.document.User;
 import com.thss.androidbackend.model.dto.post.ReplyCreateDto;
 import com.thss.androidbackend.model.vo.forum.PostCover;
 import com.thss.androidbackend.model.vo.forum.PostCoverList;
+import com.thss.androidbackend.model.vo.user.UserMeta;
 import com.thss.androidbackend.repository.PostRepository;
 import com.thss.androidbackend.repository.UserRepository;
 import com.thss.androidbackend.service.forum.PostService;
@@ -74,47 +75,42 @@ public class PostController {
             } else {
                 dir = Sort.Direction.DESC;
             }
-            if (securityService.isAnonymous()) {
-                List<PostCover> postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
-                        .map(postService::getPostCover)
-                        .toList();
-                PostCoverList postPage = new PostCoverList(postCovers);
-                return ResponseEntity.ok(postPage);
-            } else {
-                User self = securityService.getCurrentUser();
-                List<String> blackList = self.getBlackList().stream().map(u -> u.getId()).toList();
-                List<PostCover> postCovers;
-                if (sort.equalsIgnoreCase("hot")){
-                    if("ASC".equals(direction)){
-                        postCovers = postRepository.findAll(Sort.by(dir, "createTime")).stream()
-                                .filter(post -> !blackList.contains(post.getCreator().getId()))
-                                .sorted(Comparator.comparingInt(o -> o.getComments().size()))
-                                .map(postService::getPostCover)
-                                .toList();
-                    } else {
-                        postCovers = postRepository.findAll(Sort.by(dir, "createTime")).stream()
-                                .filter(post -> !blackList.contains(post.getCreator().getId()))
-                                .sorted((o1, o2) -> o2.getComments().size() - o1.getComments().size())
-                                .map(postService::getPostCover)
-                                .toList();
-                    }
+            List<PostCover> postCovers;
+            if (sort.equalsIgnoreCase("hot")){
+                if("ASC".equals(direction)){
+                    postCovers = postRepository.findAll().stream()
+                            .sorted(Comparator.comparingInt(o -> o.getComments().size()))
+                            .map(postService::getPostCover)
+                            .toList();
                 } else {
-                    postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
-                            .filter(post -> !blackList.contains(post.getCreator().getId()))
+                    postCovers = postRepository.findAll().stream()
+                            .sorted((o1, o2) -> o2.getComments().size() - o1.getComments().size())
                             .map(postService::getPostCover)
                             .toList();
                 }
+            } else {
+                postCovers = postRepository.findAll(Sort.by(dir, sort)).stream()
+                        .map(postService::getPostCover)
+                        .toList();
+            }
+            if (!securityService.isAnonymous()) {
+                User self = securityService.getCurrentUser();
+                List<UserMeta> blackList = self.getBlackList().stream().map(User::getMeta).toList();
+                postCovers = postCovers.stream()
+                        .filter(post -> !blackList.contains(post.creator()))
+                        .toList();
+
                 if(filter.equalsIgnoreCase("subscribed")) {
-                    List<User> subscribers = self.getFollowList();
+                    List<UserMeta> subscribers = self.getFollowList().stream().map(User::getMeta).toList();
                     postCovers = postCovers.stream()
                             .filter(post -> subscribers.contains(post.creator()))
                             .toList();
                     System.out.println("filtered subscribed");
                 }
-                PostCoverList postPage = new PostCoverList(postCovers);
-                return ResponseEntity.ok(postPage);
             }
 
+            PostCoverList postPage = new PostCoverList(postCovers);
+            return ResponseEntity.ok(postPage);
         } catch (CustomException e) {
             return new ResponseEntity(e.getMessage(), e.getStatus());
         }
